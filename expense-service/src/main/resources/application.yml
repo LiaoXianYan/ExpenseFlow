@@ -36,6 +36,11 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
+expense:
+  ocr:
+    mock: true
+    upload-path: ./upload/invoice
+
 management:
   endpoints:
     web:
