@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/expense/report")
 @RequiredArgsConstructor
-public class ExpenseReportController {
+public class ExpenseReportController extends BaseController {
 
     private final ExpenseReportService reportService;
 
@@ -21,9 +21,8 @@ public class ExpenseReportController {
     public Result<Page<ExpenseReportVO>> page(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status,
-            @RequestHeader("X-User-Id") Long userId) {
-        return reportService.page(page, size, userId, status);
+            @RequestParam(required = false) String status) {
+        return reportService.page(page, size, getCurrentUserId(), status);
     }
 
     @GetMapping("/{id}")
@@ -34,6 +33,7 @@ public class ExpenseReportController {
     @PostMapping
     @AuditLog(module = "报销单", operation = "CREATE")
     public Result<ExpenseReportVO> create(@Valid @RequestBody ExpenseReportDTO dto) {
+        dto.setApplicantId(getCurrentUserId());
         return reportService.create(dto);
     }
 

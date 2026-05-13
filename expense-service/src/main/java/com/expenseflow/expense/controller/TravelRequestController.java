@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/expense/travel")
 @RequiredArgsConstructor
-public class TravelRequestController {
+public class TravelRequestController extends BaseController {
 
     private final TravelRequestService travelService;
 
@@ -21,9 +21,8 @@ public class TravelRequestController {
     public Result<Page<TravelRequestVO>> page(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status,
-            @RequestHeader("X-User-Id") Long userId) {
-        return travelService.page(page, size, userId, status);
+            @RequestParam(required = false) String status) {
+        return travelService.page(page, size, getCurrentUserId(), status);
     }
 
     @GetMapping("/{id}")
@@ -34,6 +33,7 @@ public class TravelRequestController {
     @PostMapping
     @AuditLog(module = "出差申请", operation = "CREATE")
     public Result<TravelRequestVO> create(@Valid @RequestBody TravelRequestDTO dto) {
+        dto.setApplicantId(getCurrentUserId());
         return travelService.create(dto);
     }
 

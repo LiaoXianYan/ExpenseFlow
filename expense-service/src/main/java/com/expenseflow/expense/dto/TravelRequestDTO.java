@@ -22,6 +22,7 @@ public class TravelRequestDTO {
     @NotNull(message = "结束日期不能为空")
     private LocalDate endDate;
 
+    private Long applicantId;
     private BigDecimal estimatedAmount;
     private String companions;
     private Long departmentId;

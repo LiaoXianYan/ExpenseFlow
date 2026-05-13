@@ -13,16 +13,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/expense/cost")
 @RequiredArgsConstructor
-public class CostRecordController {
+public class CostRecordController extends BaseController {
 
     private final CostRecordService costService;
 
     @GetMapping("/page")
     public Result<Page<ExCostRecord>> page(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestHeader("X-User-Id") Long userId) {
-        return costService.page(page, size, userId);
+            @RequestParam(defaultValue = "10") int size) {
+        return costService.page(page, size, getCurrentUserId());
     }
 
     @PostMapping

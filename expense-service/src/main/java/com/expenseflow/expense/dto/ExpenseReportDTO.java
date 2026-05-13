@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Data
 public class ExpenseReportDTO {
 
+    private Long applicantId;
     @NotNull(message = "报销日期不能为空")
     private LocalDate reportDate;
 

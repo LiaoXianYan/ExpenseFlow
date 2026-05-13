@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/expense/payment")
 @RequiredArgsConstructor
-public class PaymentRecordController {
+public class PaymentRecordController extends BaseController {
 
     private final PaymentService paymentService;
 
@@ -24,7 +24,7 @@ public class PaymentRecordController {
 
     @PostMapping("/pay")
     @AuditLog(module = "打款管理", operation = "PAY")
-    public Result<ExPaymentRecord> pay(@RequestParam Long reportId, @RequestHeader("X-User-Id") Long operatorId) {
-        return paymentService.pay(reportId, operatorId);
+    public Result<ExPaymentRecord> pay(@RequestParam Long reportId) {
+        return paymentService.pay(reportId, getCurrentUserId());
     }
 }
