@@ -37,6 +37,8 @@
         <mysql.version>8.0.33</mysql.version>
         <hutool.version>5.8.25</hutool.version>
         <knife4j.version>4.4.0</knife4j.version>
+        <jjwt.version>0.12.6</jjwt.version>
+        <sentinel.version>2023.0.1.0</sentinel.version>
     </properties>
 
     <dependencyManagement>
@@ -129,6 +131,13 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <excludes>
                         <exclude>
