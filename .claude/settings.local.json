@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn --version)",
+      "Bash(mvn clean *)",
+      "Bash(mvn compile *)",
+      "Bash(mvn spring-boot:run)",
+      "Bash(java -jar ai-service/target/ai-service-1.0.0-SNAPSHOT.jar)",
+      "Bash(echo \"ai PID: $!\")",
+      "Bash(java -jar notification-service/target/notification-service-1.0.0-SNAPSHOT.jar)",
+      "Bash(echo \"notification PID: $!\")",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git show *)"
+    ]
+  }
+}

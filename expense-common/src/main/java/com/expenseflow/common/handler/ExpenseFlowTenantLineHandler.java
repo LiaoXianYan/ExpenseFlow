@@ -11,7 +11,9 @@ public class ExpenseFlowTenantLineHandler implements TenantLineHandler {
     @Override
     public boolean ignoreTable(String tableName) {
         return "sys_tenant".equalsIgnoreCase(tableName)
-                || "sys_permission".equalsIgnoreCase(tableName);
+                || "sys_permission".equalsIgnoreCase(tableName)
+                || "sys_user_role".equalsIgnoreCase(tableName)
+                || "sys_role_permission".equalsIgnoreCase(tableName);
     }
 
     @Override

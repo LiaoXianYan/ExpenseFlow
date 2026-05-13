@@ -52,7 +52,8 @@ public class OAuthController {
             // Auto-create user
             user = new SysUser();
             user.setTenantId(1L);
-            user.setUsername("dingtalk_" + openId.substring(0, Math.min(12, openId.length())));
+            String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+            user.setUsername("dt_" + randomPart);
             user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
             user.setRealName("钉钉用户" + openId.substring(0, Math.min(4, openId.length())));
             user.setStatus(1);

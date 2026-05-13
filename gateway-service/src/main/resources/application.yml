@@ -56,14 +56,6 @@ spring:
     sentinel:
       transport:
         port: 8719
-      datasource:
-        ds1:
-          nacos:
-            server-addr: localhost:8848
-            data-id: gateway-sentinel-rules
-            group-id: DEFAULT_GROUP
-            data-type: json
-            rule-type: gw-flow
   data:
     redis:
       host: localhost

@@ -1,19 +1,24 @@
 package com.expenseflow.system.entity;
 
-import com.expenseflow.common.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import java.time.LocalDateTime;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @TableName("sys_tenant")
-public class SysTenant extends BaseEntity {
+public class SysTenant {
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long id;
     private String tenantCode;
     private String tenantName;
     private String contactName;
     private String contactPhone;
     private Integer status;
     private LocalDateTime expireTime;
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+    @TableLogic
+    private Integer deleted;
 }
