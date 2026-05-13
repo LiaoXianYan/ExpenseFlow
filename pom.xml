@@ -39,6 +39,7 @@
         <knife4j.version>4.4.0</knife4j.version>
         <jjwt.version>0.12.6</jjwt.version>
         <sentinel.version>2023.0.1.0</sentinel.version>
+        <aliyun-ocr.version>1.0.0</aliyun-ocr.version>
     </properties>
 
     <dependencyManagement>
