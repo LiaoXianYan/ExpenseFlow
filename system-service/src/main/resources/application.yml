@@ -4,9 +4,11 @@ server:
 spring:
   application:
     name: system-service
+  config:
+    import: "optional:nacos:${spring.application.name}.yaml"
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3307/expense_flow?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3307/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: ${DB_PASSWORD:root}
     hikari:
@@ -37,7 +39,7 @@ management:
     web:
       exposure:
         include: health,info,prometheus
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
