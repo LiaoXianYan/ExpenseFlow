@@ -54,18 +54,22 @@ public class JwtUtil {
     }
 
     public static Long getUserId(Claims claims) {
+        if (claims == null) return null;
         return Long.valueOf(claims.getSubject());
     }
 
     public static Long getTenantId(Claims claims) {
+        if (claims == null) return null;
         return claims.get("tenantId", Long.class);
     }
 
     public static String getTokenId(Claims claims) {
+        if (claims == null) return null;
         return claims.getId();
     }
 
     public static boolean isExpired(Claims claims) {
+        if (claims == null || claims.getExpiration() == null) return true;
         return claims.getExpiration().before(new Date());
     }
 }
