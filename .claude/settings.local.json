@@ -11,7 +11,8 @@
       "Bash(echo \"notification PID: $!\")",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git show *)"
+      "Bash(git show *)",
+      "Bash(curl *)"
     ]
   }
 }

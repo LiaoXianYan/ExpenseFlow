@@ -43,11 +43,8 @@
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'REJECTED'}</conditionExpression>
         </sequenceFlow>
 
-        <!-- GW Finance: approved → Manager -->
-        <sequenceFlow id="flow_gwf_approve" sourceRef="gwFinance" targetRef="managerApproval">
-            <conditionExpression xsi:type="tFormalExpression"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'APPROVED'}</conditionExpression>
-        </sequenceFlow>
+        <!-- GW Finance default: approved → Manager -->
+        <sequenceFlow id="flow_gwf_approve" sourceRef="gwFinance" targetRef="managerApproval" />
 
         <!-- Manager → Gateway -->
         <sequenceFlow id="flow_mgr_to_gw" sourceRef="managerApproval" targetRef="gwManager" />
@@ -58,11 +55,8 @@
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'REJECTED'}</conditionExpression>
         </sequenceFlow>
 
-        <!-- GW Manager: approved → approvedEnd -->
-        <sequenceFlow id="flow_gwm_approve" sourceRef="gwManager" targetRef="approvedEnd">
-            <conditionExpression xsi:type="tFormalExpression"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'APPROVED'}</conditionExpression>
-        </sequenceFlow>
+        <!-- GW Manager default: approved → approvedEnd -->
+        <sequenceFlow id="flow_gwm_approve" sourceRef="gwManager" targetRef="approvedEnd" />
 
     </process>
 

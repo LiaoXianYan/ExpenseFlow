@@ -13,6 +13,8 @@ import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,6 +108,7 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
         record.setTaskName(task.getName());
         record.setApproverId(approverId);
         record.setApproverName(approverName != null ? approverName : "未知");
+        record.setTenantId(getCurrentTenantId());
         record.setAction(dto.getAction());
         record.setComment(dto.getComment());
         record.setActionTime(LocalDateTime.now());
@@ -135,6 +138,7 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
         record.setTaskId(taskId);
         record.setTaskName(task.getName());
         record.setApproverId(fromUserId);
+        record.setTenantId(getCurrentTenantId());
         record.setAction("DELEGATE");
         record.setComment("委派给 " + delegateToUser);
         record.setActionTime(LocalDateTime.now());
@@ -159,5 +163,13 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
             vos.add(vo);
         }
         return vos;
+    }
+
+    private Long getCurrentTenantId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getDetails() instanceof Long) {
+            return (Long) auth.getDetails();
+        }
+        return 0L;
     }
 }

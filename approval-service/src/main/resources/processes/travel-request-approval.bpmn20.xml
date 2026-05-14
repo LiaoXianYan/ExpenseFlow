@@ -36,7 +36,7 @@
         <!-- Start → Manager -->
         <sequenceFlow id="flow_start_to_manager" sourceRef="start" targetRef="managerApproval" />
 
-        <!-- Manager → Gateway 1 (check outcome) -->
+        <!-- Manager → Gateway 1 -->
         <sequenceFlow id="flow_mgr_to_gw1" sourceRef="managerApproval" targetRef="gw1" />
 
         <!-- GW1: rejected → rejectedEnd -->
@@ -45,25 +45,19 @@
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'REJECTED'}</conditionExpression>
         </sequenceFlow>
 
-        <!-- GW1: approved → director check gateway -->
-        <sequenceFlow id="flow_gw1_approve" sourceRef="gw1" targetRef="gwDirectorCheck">
-            <conditionExpression xsi:type="tFormalExpression"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'APPROVED'}</conditionExpression>
-        </sequenceFlow>
+        <!-- GW1 default: approved → director check -->
+        <sequenceFlow id="flow_gw1_approve" sourceRef="gw1" targetRef="gwDirectorCheck" />
 
-        <!-- Director Check: needDirector=true → Director Approval -->
+        <!-- Director Check: needDirector=true → Director -->
         <sequenceFlow id="flow_dir_yes" sourceRef="gwDirectorCheck" targetRef="directorApproval">
             <conditionExpression xsi:type="tFormalExpression"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${needDirector == true}</conditionExpression>
         </sequenceFlow>
 
-        <!-- Director Check: needDirector=false → skip to approved end -->
-        <sequenceFlow id="flow_dir_skip" sourceRef="gwDirectorCheck" targetRef="approvedEnd">
-            <conditionExpression xsi:type="tFormalExpression"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${needDirector == false}</conditionExpression>
-        </sequenceFlow>
+        <!-- Director Check default: skip → approved end -->
+        <sequenceFlow id="flow_dir_skip" sourceRef="gwDirectorCheck" targetRef="approvedEnd" />
 
-        <!-- Director → Gateway 2 (check outcome) -->
+        <!-- Director → Gateway 2 -->
         <sequenceFlow id="flow_dir_to_gw2" sourceRef="directorApproval" targetRef="gw2" />
 
         <!-- GW2: rejected → rejectedEnd -->
@@ -72,11 +66,8 @@
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'REJECTED'}</conditionExpression>
         </sequenceFlow>
 
-        <!-- GW2: approved → approvedEnd -->
-        <sequenceFlow id="flow_gw2_approve" sourceRef="gw2" targetRef="approvedEnd">
-            <conditionExpression xsi:type="tFormalExpression"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'APPROVED'}</conditionExpression>
-        </sequenceFlow>
+        <!-- GW2 default: approved → approvedEnd -->
+        <sequenceFlow id="flow_gw2_approve" sourceRef="gw2" targetRef="approvedEnd" />
 
     </process>
 
