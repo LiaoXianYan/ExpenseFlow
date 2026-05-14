@@ -6,6 +6,7 @@ import com.expenseflow.notification.service.TemplateService;
 import com.expenseflow.notification.vo.TemplateVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/notification/template")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('SUPER_ADMIN')")
 public class TemplateController {
 
     private final TemplateService templateService;

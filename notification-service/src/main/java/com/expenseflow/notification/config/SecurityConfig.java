@@ -66,7 +66,10 @@ public class SecurityConfig {
             if (claims != null && !JwtUtil.isExpired(claims)) {
                 Long userId = JwtUtil.getUserId(claims);
                 Long tenantId = JwtUtil.getTenantId(claims);
-                List<SimpleGrantedAuthority> authorities = Collections.emptyList();
+                List<String> roles = JwtUtil.getRoles(claims);
+                List<SimpleGrantedAuthority> authorities = roles.stream()
+                    .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
+                    .toList();
                 UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userId, null, authorities);
                 auth.setDetails(tenantId);

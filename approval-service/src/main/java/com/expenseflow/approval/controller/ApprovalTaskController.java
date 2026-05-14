@@ -8,6 +8,7 @@ import com.expenseflow.approval.vo.ApprovalTaskVO;
 import com.expenseflow.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/approval/task")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('APPROVER','FINANCE','SUPER_ADMIN')")
 public class ApprovalTaskController extends BaseController {
 
     private final ApprovalTaskService taskService;
