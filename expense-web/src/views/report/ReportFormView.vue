@@ -4,7 +4,7 @@
       <template #header><span>{{ isEdit ? '编辑报销单' : '新建报销单' }}</span></template>
       <el-form :model="form" label-width="100px">
         <el-row :gutter="20">
-          <el-col :span="12"><el-form-item label="报销日期"><el-date-picker v-model="form.reportDate" type="date" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="报销日期"><el-input v-model="form.reportDate" type="date" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="备注"><el-input v-model="form.remark" /></el-form-item></el-col>
         </el-row>
       </el-form>
@@ -32,7 +32,7 @@
     <el-dialog v-model="showItemDialog" title="添加明细" width="400px">
       <el-form :model="itemForm" label-width="80px">
         <el-form-item label="费用类型"><el-select v-model="itemForm.expenseType" style="width:100%"><el-option v-for="t in ['TRANSPORT','HOTEL','MEAL','OTHER']" :key="t" :label="t" :value="t" /></el-select></el-form-item>
-        <el-form-item label="日期"><el-date-picker v-model="itemForm.expenseDate" type="date" style="width:100%" /></el-form-item>
+        <el-form-item label="日期"><el-input v-model="itemForm.expenseDate" type="date" /></el-form-item>
         <el-form-item label="金额"><el-input-number v-model="itemForm.amount" :min="0" :precision="2" style="width:100%" /></el-form-item>
         <el-form-item label="说明"><el-input v-model="itemForm.description" /></el-form-item>
       </el-form>

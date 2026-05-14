@@ -12,7 +12,8 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git show *)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(python test_m6_e2e.py)"
     ]
   }
 }

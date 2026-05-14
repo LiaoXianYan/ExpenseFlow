@@ -11,10 +11,10 @@
             <el-form-item label="目的地" prop="destination"><el-input v-model="form.destination" /></el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="开始日期" prop="startDate"><el-date-picker v-model="form.startDate" type="date" style="width:100%" /></el-form-item>
+            <el-form-item label="开始日期" prop="startDate"><el-input v-model="form.startDate" type="date" /></el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="结束日期" prop="endDate"><el-date-picker v-model="form.endDate" type="date" style="width:100%" /></el-form-item>
+            <el-form-item label="结束日期" prop="endDate"><el-input v-model="form.endDate" type="date" /></el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="预估金额" prop="estimatedAmount"><el-input-number v-model="form.estimatedAmount" :min="0" :precision="2" style="width:100%" /></el-form-item>
