@@ -1,4 +1,4 @@
-package com.expenseflow.expense.config;
+package com.expenseflow.approval.config;
 
 import com.expenseflow.common.util.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -42,7 +42,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/**", "/expense/callback/**").permitAll()
+                .requestMatchers("/actuator/**", "/approval/callback/**",
+                    "/approval/process/start").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

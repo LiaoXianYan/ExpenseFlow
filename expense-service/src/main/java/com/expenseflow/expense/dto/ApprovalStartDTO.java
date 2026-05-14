@@ -1,10 +1,8 @@
 package com.expenseflow.expense.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class ApprovalStartDTO {
 
     private String businessType;
@@ -12,4 +10,6 @@ public class ApprovalStartDTO {
     private String requestNo;
     private Long applicantId;
     private String applicantName;
+    private java.math.BigDecimal amount;
+    private Long departmentId;
 }

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.flowable.org/processdef">
+
+    <process id="expense-report-approval" name="报销单审批" isExecutable="true">
+
+        <startEvent id="start" flowable:formFieldValidation="false" />
+
+        <userTask id="financeVerify" name="财务审核"
+                  flowable:candidateGroups="finance" />
+
+        <exclusiveGateway id="gwFinance" default="flow_gwf_approve" />
+
+        <userTask id="managerApproval" name="经理审批"
+                  flowable:candidateGroups="manager" />
+
+        <exclusiveGateway id="gwManager" default="flow_gwm_approve" />
+
+        <endEvent id="approvedEnd" name="审批通过">
+            <extensionElements>
+                <flowable:executionListener event="end"
+                    delegateExpression="${approvalCallbackDelegate}" />
+            </extensionElements>
+        </endEvent>
+
+        <endEvent id="rejectedEnd" name="审批驳回">
+            <extensionElements>
+                <flowable:executionListener event="end"
+                    delegateExpression="${approvalCallbackDelegate}" />
+            </extensionElements>
+        </endEvent>
+
+        <!-- Start → Finance -->
+        <sequenceFlow id="flow_start_to_finance" sourceRef="start" targetRef="financeVerify" />
+
+        <!-- Finance → Gateway -->
+        <sequenceFlow id="flow_finance_to_gw" sourceRef="financeVerify" targetRef="gwFinance" />
+
+        <!-- GW Finance: rejected → rejectedEnd -->
+        <sequenceFlow id="flow_gwf_reject" sourceRef="gwFinance" targetRef="rejectedEnd">
+            <conditionExpression xsi:type="tFormalExpression"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'REJECTED'}</conditionExpression>
+        </sequenceFlow>
+
+        <!-- GW Finance: approved → Manager -->
+        <sequenceFlow id="flow_gwf_approve" sourceRef="gwFinance" targetRef="managerApproval">
+            <conditionExpression xsi:type="tFormalExpression"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'APPROVED'}</conditionExpression>
+        </sequenceFlow>
+
+        <!-- Manager → Gateway -->
+        <sequenceFlow id="flow_mgr_to_gw" sourceRef="managerApproval" targetRef="gwManager" />
+
+        <!-- GW Manager: rejected → rejectedEnd -->
+        <sequenceFlow id="flow_gwm_reject" sourceRef="gwManager" targetRef="rejectedEnd">
+            <conditionExpression xsi:type="tFormalExpression"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'REJECTED'}</conditionExpression>
+        </sequenceFlow>
+
+        <!-- GW Manager: approved → approvedEnd -->
+        <sequenceFlow id="flow_gwm_approve" sourceRef="gwManager" targetRef="approvedEnd">
+            <conditionExpression xsi:type="tFormalExpression"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">${outcome == 'APPROVED'}</conditionExpression>
+        </sequenceFlow>
+
+    </process>
+
+</definitions>

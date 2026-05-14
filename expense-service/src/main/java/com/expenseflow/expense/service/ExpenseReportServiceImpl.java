@@ -119,18 +119,25 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
             if (ru != null) user = ru.getData();
         } catch (Exception ignored) {}
 
-        ApprovalStartDTO approvalDTO = new ApprovalStartDTO(
-            "EXPENSE_REPORT", r.getId(), r.getReportNo(),
-            r.getApplicantId(), user != null ? user.getRealName() : "未知");
+        ApprovalStartDTO approvalDTO = new ApprovalStartDTO();
+        approvalDTO.setBusinessType("EXPENSE_REPORT");
+        approvalDTO.setBusinessId(r.getId());
+        approvalDTO.setRequestNo(r.getReportNo());
+        approvalDTO.setApplicantId(r.getApplicantId());
+        approvalDTO.setApplicantName(user != null ? user.getRealName() : "未知");
+        approvalDTO.setAmount(total);
+        approvalDTO.setDepartmentId(r.getDepartmentId());
+
         String processInstanceId;
         try {
-            Result<String> approvalResult = approvalFeignClient.startApproval(approvalDTO);
-            processInstanceId = approvalResult != null ? approvalResult.getData() : null;
+            var approvalResult = approvalFeignClient.startApproval(approvalDTO);
+            processInstanceId = approvalResult != null && approvalResult.getData() != null
+                ? approvalResult.getData().getProcessInstanceId() : null;
         } catch (Exception e) {
-            processInstanceId = "mock-pi-" + java.util.UUID.randomUUID().toString().substring(0, 12);
+            processInstanceId = "fallback-pi-" + java.util.UUID.randomUUID().toString().substring(0, 12);
         }
 
-        r.setStatus("APPROVED");
+        r.setStatus("APPROVING");
         r.setProcessInstanceId(processInstanceId);
         reportMapper.updateById(r);
         return Result.ok(toVO(r));
