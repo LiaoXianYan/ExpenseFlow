@@ -56,8 +56,13 @@ public class ApprovalCallbackController {
         event.put("businessId", businessId);
         event.put("outcome", outcome);
         event.put("tenantId", 0);
-        rabbitTemplate.convertAndSend("expense.exchange", "expense.result.notified", event);
-        log.info("RabbitMQ 消息已发送: expense.result.notified, businessId={}", businessId);
+        try {
+            String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(event);
+            rabbitTemplate.convertAndSend("expense.exchange", "expense.result.notified", json);
+            log.info("RabbitMQ 消息已发送: expense.result.notified, businessId={}", businessId);
+        } catch (Exception e) {
+            log.error("RabbitMQ 消息发送失败", e);
+        }
 
         return Result.ok();
     }
