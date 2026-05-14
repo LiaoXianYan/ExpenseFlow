@@ -17,12 +17,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.Set;
 import java.util.UUID;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
@@ -102,27 +109,74 @@ public class InvoiceServiceImpl implements InvoiceService {
         return Result.ok(vo);
     }
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Async
     void doOcr(Long invoiceId, java.io.File file) {
         ExInvoice inv = invoiceMapper.selectById(invoiceId);
         try {
-            Thread.sleep(1500);
-            inv.setOcrStatus("SUCCESS");
-            inv.setInvoiceNo("MOCK-" + invoiceId);
-            inv.setTotalAmount(new BigDecimal("100.00"));
-            inv.setAmount(new BigDecimal("94.34"));
-            inv.setTaxAmount(new BigDecimal("5.66"));
-            inv.setInvoiceDate(LocalDate.now());
-            inv.setSellerName("模拟销售方");
-            inv.setSellerTaxNo("91310000607335492B");
-            inv.setOcrConfidence(new BigDecimal("0.95"));
-            inv.setOcrRawResult("{\"mock\": true, \"invoice_id\": " + invoiceId + "}");
+            if (ocrConfig.isMock()) {
+                doMockOcr(inv, invoiceId);
+            } else {
+                doRealOcr(inv, file);
+            }
             invoiceMapper.updateById(inv);
         } catch (Exception e) {
             log.error("OCR 识别失败", e);
             inv.setOcrStatus("FAILED");
             inv.setOcrRawResult("{\"error\": \"" + e.getMessage() + "\"}");
             invoiceMapper.updateById(inv);
+        }
+    }
+
+    private void doMockOcr(ExInvoice inv, Long invoiceId) throws InterruptedException {
+        Thread.sleep(800);
+        inv.setOcrStatus("SUCCESS");
+        inv.setInvoiceNo("MOCK-" + invoiceId);
+        inv.setTotalAmount(new BigDecimal("100.00"));
+        inv.setAmount(new BigDecimal("94.34"));
+        inv.setTaxAmount(new BigDecimal("5.66"));
+        inv.setInvoiceDate(LocalDate.now());
+        inv.setSellerName("模拟销售方");
+        inv.setSellerTaxNo("91310000607335492B");
+        inv.setOcrConfidence(new BigDecimal("0.95"));
+        inv.setOcrRawResult("{\"mock\":true}");
+    }
+
+    private void doRealOcr(ExInvoice inv, java.io.File file) throws Exception {
+        byte[] fileBytes = Files.readAllBytes(file.toPath());
+        String base64 = Base64.getEncoder().encodeToString(fileBytes);
+
+        String body = objectMapper.writeValueAsString(
+            java.util.Map.of("image", base64));
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(ocrConfig.getEndpoint()))
+            .header("Authorization", "APPCODE " + ocrConfig.getAppCode())
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        inv.setOcrRawResult(response.body());
+
+        if (response.statusCode() == 200) {
+            @SuppressWarnings("unchecked")
+            var map = objectMapper.readValue(response.body(), java.util.Map.class);
+            inv.setOcrStatus("SUCCESS");
+
+            if (map.get("invoice_num") != null) inv.setInvoiceNo(map.get("invoice_num").toString());
+            if (map.get("total_amount") != null) inv.setTotalAmount(new BigDecimal(map.get("total_amount").toString()));
+            if (map.get("invoice_date") != null) inv.setInvoiceDate(LocalDate.parse(map.get("invoice_date").toString()));
+            if (map.get("seller_name") != null) inv.setSellerName(map.get("seller_name").toString());
+            if (map.get("seller_tax_no") != null) inv.setSellerTaxNo(map.get("seller_tax_no").toString());
+            if (map.get("confidence") != null) inv.setOcrConfidence(new BigDecimal(map.get("confidence").toString()));
+
+            log.info("阿里云 OCR 识别成功: invoiceId={}", inv.getInvoiceNo());
+        } else {
+            inv.setOcrStatus("FAILED");
+            log.error("阿里云 OCR 返回非200: status={}", response.statusCode());
         }
     }
 

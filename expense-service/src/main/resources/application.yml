@@ -42,17 +42,16 @@ mybatis-plus:
       logic-not-delete-value: 0
 
 # ============================================================
-# 阿里云 OCR 配置 — 接入真实 OCR 只需:
-#   1. 设置 mock: false
-#   2. 填入 access-key-id 和 access-key-secret
-# 未设置时自动降级为 Mock OCR (无需 AK/SK)
+# 阿里云 OCR 配置 — 已配置真实 AppCode 认证
+# mock: false 启用真实 API，mock: true 降级 Mock
 # ============================================================
 expense:
   ocr:
-    mock: true
+    mock: false
     upload-path: ./upload/invoice
-    access-key-id: ${ALIYUN_ACCESS_KEY_ID:}
-    access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET:}
+    app-code: 205005985
+    app-key: BzxBhy3CafbJRi6xFWyaU7oJ2sodvAin
+    app-secret: c807349119c4449ebb2cd9757218e397
 
 management:
   endpoints:
