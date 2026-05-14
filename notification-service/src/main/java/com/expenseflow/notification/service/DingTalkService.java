@@ -6,10 +6,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
 @Slf4j
@@ -26,7 +31,26 @@ public class DingTalkService {
             return;
         }
 
+        String webhookUrl = dingTalkConfig.getWebhookUrl();
+        if (webhookUrl == null || webhookUrl.isBlank()) {
+            log.warn("[钉钉] Webhook URL 未配置，跳过发送");
+            return;
+        }
+
         try {
+            // 加签: HMAC-SHA256
+            String secret = dingTalkConfig.getSecret();
+            if (secret != null && !secret.isBlank()) {
+                long timestamp = System.currentTimeMillis();
+                String stringToSign = timestamp + "\n" + secret;
+                Mac mac = Mac.getInstance("HmacSHA256");
+                mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+                byte[] signData = mac.doFinal(stringToSign.getBytes(StandardCharsets.UTF_8));
+                String sign = URLEncoder.encode(Base64.getEncoder().encodeToString(signData), StandardCharsets.UTF_8);
+                webhookUrl = webhookUrl + (webhookUrl.contains("?") ? "&" : "?")
+                    + "timestamp=" + timestamp + "&sign=" + sign;
+            }
+
             String text = "## " + title + "\n\n" + content;
             String body = objectMapper.writeValueAsString(Map.of(
                 "msgtype", "markdown",
@@ -34,9 +58,9 @@ public class DingTalkService {
             ));
 
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(dingTalkConfig.getWebhookUrl()))
+                .uri(URI.create(webhookUrl))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
                 .build();
 
             HttpClient client = HttpClient.newHttpClient();

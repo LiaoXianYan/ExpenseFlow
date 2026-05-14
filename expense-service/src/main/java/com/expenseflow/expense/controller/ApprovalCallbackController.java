@@ -33,15 +33,18 @@ public class ApprovalCallbackController {
         log.info("审批回调: businessType={}, businessId={}, outcome={}", businessType, businessId, outcome);
 
         String status = "REJECTED".equals(outcome) ? "REJECTED" : "APPROVED";
+        Long applicantId = null;
 
         if ("TRAVEL_REQUEST".equals(businessType)) {
             ExTravelRequest t = travelMapper.selectById(businessId);
             if (t == null) return Result.fail(404, "出差申请不存在");
+            applicantId = t.getApplicantId();
             t.setStatus(status);
             travelMapper.updateById(t);
         } else if ("EXPENSE_REPORT".equals(businessType)) {
             ExExpenseReport r = reportMapper.selectById(businessId);
             if (r == null) return Result.fail(404, "报销单不存在");
+            applicantId = r.getApplicantId();
             r.setStatus(status);
             reportMapper.updateById(r);
         } else {
@@ -56,9 +59,9 @@ public class ApprovalCallbackController {
         event.put("businessId", businessId);
         event.put("outcome", outcome);
         event.put("tenantId", 0);
+        if (applicantId != null) event.put("applicantId", applicantId);
         try {
-            String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(event);
-            rabbitTemplate.convertAndSend("expense.exchange", "expense.result.notified", json);
+            rabbitTemplate.convertAndSend("expense.exchange", "expense.result.notified", event);
             log.info("RabbitMQ 消息已发送: expense.result.notified, businessId={}", businessId);
         } catch (Exception e) {
             log.error("RabbitMQ 消息发送失败", e);

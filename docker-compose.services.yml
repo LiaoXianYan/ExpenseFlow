@@ -13,6 +13,8 @@ services:
       - "8080:8080"
     environment:
       TZ: Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_DATA_REDIS_HOST: redis
     depends_on:
       nacos:
         condition: service_healthy
@@ -32,6 +34,10 @@ services:
     environment:
       TZ: Asia/Shanghai
       DB_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_CONFIG_SERVER-ADDR: nacos:8848
+      SPRING_DATA_REDIS_HOST: redis
     depends_on:
       mysql:
         condition: service_healthy
@@ -55,6 +61,14 @@ services:
     environment:
       TZ: Asia/Shanghai
       DB_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_CONFIG_SERVER-ADDR: nacos:8848
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_RABBITMQ_HOST: rabbitmq
+      OCR_APP_CODE: ${OCR_APP_CODE:-}
+      OCR_APP_KEY: ${OCR_APP_KEY:-}
+      OCR_APP_SECRET: ${OCR_APP_SECRET:-}
     depends_on:
       mysql:
         condition: service_healthy
@@ -80,10 +94,19 @@ services:
     environment:
       TZ: Asia/Shanghai
       DB_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_CONFIG_SERVER-ADDR: nacos:8848
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_RABBITMQ_HOST: rabbitmq
     depends_on:
       mysql:
         condition: service_healthy
       nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     networks:
       - expense-net
@@ -101,6 +124,10 @@ services:
     environment:
       TZ: Asia/Shanghai
       DB_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_CONFIG_SERVER-ADDR: nacos:8848
+      SPRING_RABBITMQ_HOST: rabbitmq
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-sk-default}
     depends_on:
       mysql:
@@ -125,6 +152,12 @@ services:
     environment:
       TZ: Asia/Shanghai
       DB_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_CONFIG_SERVER-ADDR: nacos:8848
+      SPRING_RABBITMQ_HOST: rabbitmq
+      DINGTALK_WEBHOOK_URL: ${DINGTALK_WEBHOOK_URL:-}
+      DINGTALK_SECRET: ${DINGTALK_SECRET:-}
     depends_on:
       mysql:
         condition: service_healthy

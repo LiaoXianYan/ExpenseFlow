@@ -71,24 +71,28 @@ set DEEPSEEK_API_KEY=sk-xxxxxxxx
 # Linux / Docker
 export DEEPSEEK_API_KEY=sk-xxxxxxxx
 ```
+或在 `docker-compose.services.yml` 中设置 `DEEPSEEK_API_KEY` 环境变量。
 设置后 AI 审单和 RAG 问答自动调用 DeepSeek Chat API。
-未设置时自动降级为 Java Mock 引擎（与真实 API 结果逻辑一致）。
+未设置时自动降级为 Java Mock 引擎。
 
 ### 阿里云 OCR
-在 `expense-service/src/main/resources/application.yml` 中修改：
-```yaml
-expense:
-  ocr:
-    mock: false
-    access-key-id: your_aliyun_ak
-    access-key-secret: your_aliyun_sk
-```
-或通过环境变量：
+通过环境变量配置（支持 AppCode 认证）：
 ```bash
-export ALIYUN_ACCESS_KEY_ID=your_aliyun_ak
-export ALIYUN_ACCESS_KEY_SECRET=your_aliyun_sk
+export OCR_APP_CODE=your_app_code
+export OCR_APP_KEY=your_app_key
+export OCR_APP_SECRET=your_app_secret
 ```
-未设置时自动降级为 Mock OCR（识别模拟发票数据）。
+或在 `docker-compose.services.yml` 的 expense-service 中设置对应环境变量。
+未设置时自动降级为 Mock OCR。
+
+### 钉钉机器人通知
+```bash
+export DINGTALK_WEBHOOK_URL=https://oapi.dingtalk.com/robot/send?access_token=xxx
+export DINGTALK_SECRET=SECxxxx  # 机器人加签密钥（安全设置 → 加签）
+```
+或在 `docker-compose.services.yml` 的 notification-service 中设置。
+`DINGTALK_SECRET` 用于 HMAC-SHA256 加签，未设置时不加签。
+未设置 Webhook URL 时仅发送站内消息。
 
 ## 环境变量
 
@@ -96,8 +100,11 @@ export ALIYUN_ACCESS_KEY_SECRET=your_aliyun_sk
 |------|--------|------|
 | DB_PASSWORD | root | MySQL 密码 |
 | DEEPSEEK_API_KEY | sk-default | DeepSeek API Key (未设置自动 Mock) |
-| ALIYUN_ACCESS_KEY_ID | - | 阿里云 AK (未设置自动 Mock) |
-| ALIYUN_ACCESS_KEY_SECRET | - | 阿里云 SK (未设置自动 Mock) |
+| OCR_APP_CODE | - | 阿里云 OCR AppCode (未设置自动 Mock) |
+| OCR_APP_KEY | - | 阿里云 OCR AppKey (未设置自动 Mock) |
+| OCR_APP_SECRET | - | 阿里云 OCR AppSecret (未设置自动 Mock) |
+| DINGTALK_WEBHOOK_URL | - | 钉钉机器人 Webhook URL (未设置仅站内消息) |
+| DINGTALK_SECRET | - | 钉钉机器人加签密钥 (安全设置中获取) |
 
 ## 端口规划
 

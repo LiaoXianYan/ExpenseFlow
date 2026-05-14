@@ -53,7 +53,7 @@ langchain4j:
   open-ai:
     chat-model:
       base-url: https://api.deepseek.com
-      api-key: ${DEEPSEEK_API_KEY:sk-8d9243e6d834429aa05adbd8c97d500d}
+      api-key: ${DEEPSEEK_API_KEY:sk-default}
       model-name: deepseek-chat
       timeout: 30s
       max-retries: 2

@@ -4,13 +4,13 @@
 
 1. 启动全部服务 (双击 `start-all.bat` 或 Docker Compose)
 2. 打开浏览器 → `http://localhost:5173`
-3. 登录账号: `admin` / `password`
+3. 登录账号: `admin` / `admin123`
 
 ## 演示流程
 
 ### 第一步：登录 + Dashboard (30秒)
 
-- 输入 `admin` / `password` → 登录
+- 输入 `admin` / `admin123` → 登录
 - Dashboard 展示：统计卡片 (出差申请/报销单/待审批/打款金额)
 - ECharts 饼图 (费用分布) + 柱状图 (审批统计)
 

@@ -49,9 +49,9 @@ expense:
   ocr:
     mock: false
     upload-path: ./upload/invoice
-    app-code: 205005985
-    app-key: BzxBhy3CafbJRi6xFWyaU7oJ2sodvAin
-    app-secret: c807349119c4449ebb2cd9757218e397
+    app-code: ${OCR_APP_CODE:}
+    app-key: ${OCR_APP_KEY:}
+    app-secret: ${OCR_APP_SECRET:}
 
 management:
   endpoints:

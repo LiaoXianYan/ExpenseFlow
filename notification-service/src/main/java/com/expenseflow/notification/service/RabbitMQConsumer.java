@@ -20,10 +20,9 @@ public class RabbitMQConsumer {
     private final ObjectMapper objectMapper;
 
     @RabbitListener(queues = "notification.event.queue")
-    public void onNotificationEvent(String message) {
-        log.info("收到通知事件: {}", message);
+    public void onNotificationEvent(Map<String, Object> map) {
+        log.info("收到通知事件: {}", map);
         try {
-            Map<String, Object> map = objectMapper.readValue(message, Map.class);
             String eventType = (String) map.getOrDefault("eventType", "unknown");
             String businessType = (String) map.get("businessType");
             Long businessId = toLong(map.get("businessId"));

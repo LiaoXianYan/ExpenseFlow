@@ -519,23 +519,46 @@ VALUES (0, 'SYSTEM', '系统默认租户', '系统管理员', 1),
        (1, 'DEMO', '演示租户', '演示管理员', 1);
 
 INSERT INTO sys_user (id, tenant_id, username, password, real_name, phone, status)
-VALUES (1, 0, 'admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5Eh', '超级管理员', '13800000000', 1);
+VALUES (1, 0, 'admin', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '超级管理员', '13800000000', 1);
 -- 默认密码: admin123 (BCrypt 在线生成替换)
 
 INSERT INTO sys_role (id, tenant_id, role_code, role_name, role_type)
 VALUES (1, 0, 'SUPER_ADMIN', '超级管理员', 1),
-       (2, 1, 'TENANT_ADMIN', '租户管理员', 1),
-       (3, 1, 'EMPLOYEE',       '普通员工',   1),
-       (4, 1, 'APPROVER',       '审批人',     1),
-       (5, 1, 'FINANCE',        '财务审核员',  1),
-       (6, 1, 'CASHIER',        '出纳',       1);
+       (2, 0, 'TENANT_ADMIN', '租户管理员', 1),
+       (3, 0, 'EMPLOYEE',     '普通员工',   1),
+       (4, 0, 'APPROVER',     '审批人',     1),
+       (5, 0, 'FINANCE',      '财务审核员',  1),
+       (6, 0, 'CASHIER',      '出纳',       1);
 
 INSERT INTO sys_user_role (user_id, role_id) VALUES (1, 1);
 
-INSERT INTO nt_notification_template (id, tenant_id, template_code, template_name, channel, title_template, content_template)
+INSERT INTO nt_notification_template (id, tenant_id, template_code, template_name, channel, title_template, content_template, status, create_time)
 VALUES (1, 0, 'APPROVAL_PENDING', '审批待办通知', 'DINGTALK',
         '【审批待办】您有一条新的{业务类型}待审批',
-        '申请人：{申请人}\n单据编号：{单据编号}\n金额：{金额}元\n提交时间：{提交时间}\n请及时处理。'),
+        '申请人：{申请人}\n单据编号：{单据编号}\n金额：{金额}元\n提交时间：{提交时间}\n请及时处理。', 1, NOW()),
        (2, 0, 'APPROVAL_RESULT', '审批结果通知', 'DINGTALK',
         '【审批结果】您的{业务类型}已{审批结果}',
-        '单据编号：{单据编号}\n审批人：{审批人}\n审批意见：{审批意见}\n审批时间：{审批时间}');
+        '单据编号：{单据编号}\n审批人：{审批人}\n审批意见：{审批意见}\n审批时间：{审批时间}', 1, NOW()),
+       (3, 0, 'AI_REVIEW_DONE', 'AI审单完成', 'IN_APP',
+        'AI 审单结果',
+        '报销单 {编号} 的 AI 审单已完成，结果：{结果}，风险等级：{风险等级}', 1, NOW());
+
+-- 演示用户（密码均为 admin123，BCrypt 加密）
+INSERT INTO sys_user (id, tenant_id, username, password, real_name, phone, status)
+VALUES (2, 0, 'manager', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '张经理', '13800000001', 1),
+       (3, 0, 'director', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '李总监', '13800000002', 1),
+       (4, 0, 'finance', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '王财务', '13800000003', 1),
+       (5, 0, 'cashier', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '赵出纳', '13800000004', 1);
+
+INSERT INTO sys_user_role (user_id, role_id) VALUES
+(2, 4),  -- manager → APPROVER
+(3, 4),  -- director → APPROVER
+(4, 5),  -- finance → FINANCE
+(5, 6);  -- cashier → CASHIER
+
+-- 费用政策（演示用）
+INSERT INTO ex_expense_policy (tenant_id, policy_name, expense_type, max_amount, daily_limit, city_tier, effective_date, expire_date, status, create_time) VALUES
+(0, '交通费标准', 'TRANSPORT', 5000.00, NULL, 'TIER1', '2026-01-01', '2027-12-31', 1, NOW()),
+(0, '住宿费标准-一线', 'HOTEL', 500.00, 500.00, 'TIER1', '2026-01-01', '2027-12-31', 1, NOW()),
+(0, '住宿费标准-其他', 'HOTEL', 350.00, 350.00, 'TIER2', '2026-01-01', '2027-12-31', 1, NOW()),
+(0, '餐费补助', 'MEAL', 100.00, 100.00, 'TIER1', '2026-01-01', '2027-12-31', 1, NOW());

@@ -21,10 +21,9 @@ public class RabbitMQConsumer {
     private final ObjectMapper objectMapper;
 
     @RabbitListener(queues = "ai.review.queue")
-    public void onReportSubmitted(String message) {
-        log.info("收到 AI 审单消息: {}", message);
+    public void onReportSubmitted(Map<String, Object> map) {
+        log.info("收到 AI 审单消息: {}", map);
         try {
-            Map<String, Object> map = objectMapper.readValue(message, Map.class);
             ReviewRequestDTO dto = new ReviewRequestDTO();
             dto.setBusinessType("EXPENSE_REPORT");
             dto.setBusinessId(Long.valueOf(map.get("reportId").toString()));

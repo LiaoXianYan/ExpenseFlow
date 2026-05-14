@@ -35,7 +35,8 @@ mybatis-plus:
 
 dingtalk:
   mock: false
-  webhook-url: https://oapi.dingtalk.com/robot/send?access_token=d00acc979da8c7cc32ebe229dae7743540df6043e77d7149ebc33d9e53093c1f
+  webhook-url: ${DINGTALK_WEBHOOK_URL:}
+  secret: ${DINGTALK_SECRET:}
 
 management:
   endpoints:

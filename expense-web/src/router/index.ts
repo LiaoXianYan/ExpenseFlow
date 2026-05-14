@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   { path: '/login', name: 'Login', component: () => import('../views/login/LoginView.vue'), meta: { noAuth: true } },
   {
     path: '/', component: () => import('../layouts/MainLayout.vue'),
