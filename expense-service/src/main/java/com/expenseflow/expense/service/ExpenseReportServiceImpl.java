@@ -20,9 +20,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +39,7 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
     private final ApprovalFeignClient approvalFeignClient;
     private final NoGenerator noGenerator;
     private final PolicyValidator policyValidator;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public Result<Page<ExpenseReportVO>> page(int page, int size, Long applicantId, String status) {
@@ -140,6 +145,17 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
         r.setStatus("APPROVING");
         r.setProcessInstanceId(processInstanceId);
         reportMapper.updateById(r);
+
+        // 发布 AI 审单消息
+        Map<String, Object> event = new HashMap<>();
+        event.put("eventId", UUID.randomUUID().toString());
+        event.put("reportId", r.getId());
+        event.put("amount", total);
+        event.put("tenantId", 0);
+        try {
+            rabbitTemplate.convertAndSend("expense.exchange", "expense.report.submitted", event);
+        } catch (Exception ignored) {}
+
         return Result.ok(toVO(r));
     }
 

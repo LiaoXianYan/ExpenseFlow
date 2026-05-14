@@ -13,6 +13,11 @@ spring:
     password: ${DB_PASSWORD:root}
     hikari:
       maximum-pool-size: 20
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
   cloud:
     nacos:
       discovery:
@@ -37,3 +42,12 @@ management:
     metrics:
       export:
         enabled: true
+
+langchain4j:
+  open-ai:
+    chat-model:
+      base-url: https://api.deepseek.com
+      api-key: ${DEEPSEEK_API_KEY:sk-default}
+      model-name: deepseek-chat
+      timeout: 30s
+      max-retries: 2

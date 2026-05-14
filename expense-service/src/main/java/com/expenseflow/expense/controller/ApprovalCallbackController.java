@@ -7,9 +7,12 @@ import com.expenseflow.expense.mapper.ExTravelRequestMapper;
 import com.expenseflow.common.result.Result;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -19,6 +22,7 @@ public class ApprovalCallbackController {
 
     private final ExTravelRequestMapper travelMapper;
     private final ExExpenseReportMapper reportMapper;
+    private final RabbitTemplate rabbitTemplate;
 
     @PutMapping("/approval-result")
     public Result<Void> updateApprovalResult(@RequestBody Map<String, Object> body) {
@@ -44,7 +48,17 @@ public class ApprovalCallbackController {
             return Result.fail(400, "未知业务类型: " + businessType);
         }
 
-        log.info("审批结果更新完成: businessId={}, status={}", businessId, status);
+        // 发布审批结果通知事件
+        Map<String, Object> event = new HashMap<>();
+        event.put("eventId", UUID.randomUUID().toString());
+        event.put("eventType", "approval.result");
+        event.put("businessType", businessType);
+        event.put("businessId", businessId);
+        event.put("outcome", outcome);
+        event.put("tenantId", 0);
+        rabbitTemplate.convertAndSend("expense.exchange", "expense.result.notified", event);
+        log.info("RabbitMQ 消息已发送: expense.result.notified, businessId={}", businessId);
+
         return Result.ok();
     }
 
