@@ -115,9 +115,11 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
         recordMapper.insert(record);
         log.info("审批记录写入: taskId={}, action={}, approver={}", taskId, dto.getAction(), approverId);
 
-        // 设置流程变量 outcome
+        // 映射 action → BPMN outcome (BPMN gateway 检查 APPROVED/REJECTED)
+        String outcome = "APPROVE".equals(dto.getAction()) ? "APPROVED" : "REJECTED";
+
         Map<String, Object> variables = new HashMap<>();
-        variables.put("outcome", dto.getAction());
+        variables.put("outcome", outcome);
 
         taskService.complete(taskId, variables);
         log.info("任务完成: taskId={}, action={}", taskId, dto.getAction());

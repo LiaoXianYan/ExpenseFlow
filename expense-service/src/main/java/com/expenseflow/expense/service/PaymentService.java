@@ -37,6 +37,8 @@ public class PaymentService {
         ExPaymentRecord pr = new ExPaymentRecord();
         pr.setReportId(reportId);
         pr.setPaymentNo(noGenerator.generatePaymentNo());
+        pr.setPayeeName("报销人");
+        pr.setPayeeAccount("未填写");
         pr.setAmount(report.getTotalAmount());
         pr.setPaymentMethod("BANK_TRANSFER");
         pr.setPaymentStatus("SUCCESS");
