@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   gateway-service:
     build:
@@ -18,8 +16,6 @@ services:
     depends_on:
       nacos:
         condition: service_healthy
-    networks:
-      - expense-net
 
   system-service:
     build:
@@ -45,8 +41,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    networks:
-      - expense-net
 
   expense-service:
     build:
@@ -78,8 +72,6 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    networks:
-      - expense-net
 
   approval-service:
     build:
@@ -108,8 +100,6 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    networks:
-      - expense-net
 
   ai-service:
     build:
@@ -136,8 +126,6 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    networks:
-      - expense-net
 
   notification-service:
     build:
@@ -165,8 +153,6 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    networks:
-      - expense-net
 
   frontend:
     build:
@@ -183,9 +169,3 @@ services:
       - approval-service
       - ai-service
       - notification-service
-    networks:
-      - expense-net
-
-networks:
-  expense-net:
-    driver: bridge

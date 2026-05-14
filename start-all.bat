@@ -23,7 +23,7 @@ echo 编译完成
 
 echo.
 echo [3/4] 启动微服务...
-for %%s in (system-service expense-service approval-service ai-service notification-service) do (
+for %%s in (gateway-service system-service expense-service approval-service ai-service notification-service) do (
     echo   启动 %%s...
     start "%%s" java -jar %%s\target\%%s-1.0.0-SNAPSHOT.jar
 )
