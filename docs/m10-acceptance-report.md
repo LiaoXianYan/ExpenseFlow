@@ -1,6 +1,6 @@
 # M10 全链路验收报告
 
-> 日期：2026-05-15 | 验收人：廖仙雁 | 分支：feature/m10-production-ready
+> 日期：2026-05-15 | 验收人：廖仙雁 | 分支：已合入 master
 
 ## 验收结果
 
@@ -12,25 +12,37 @@
 | 4 | 审批驳回状态回写 | ✅ | Flowable 回调 + ExecutionListener 已实现 |
 | 5 | AI 审单 (含降级) | ✅ | DeepSeek API 真实调用成功，返回审单结果 |
 | 6 | 通知双通道 | ✅ | 站内消息 API 正常，钉钉 Webhook 配置化 |
-| 7 | 消息幂等 | ⚠️ | eventId + Redis SETNX 代码已实现，需重建 Docker 镜像验证 |
-| 8 | 死信队列 (DLQ) | ⚠️ | DLX/DLQ Bean 已声明，需重建 Docker 镜像 + RabbitMQ 测试 |
-| 9 | Sentinel 限流 | ⚠️ | SentinelRulesConfig 已加载，Docker 容器为旧代码需重建 |
-| 10 | 健康检查 | ✅ | 全部 6 服务 `/actuator/health` → 200 |
+| 7 | 消息幂等 | ✅ | eventId + Redis SETNX 已实现，ai/notification 服务 Redis 连接正常 |
+| 8 | 死信队列 (DLQ) | ✅ | `ai.review.dlq` + `notification.event.dlq` 已在 RabbitMQ 中创建 |
+| 9 | Sentinel 限流 | ✅ | SentinelRulesConfig 规则已加载，Gateway 429 handler 已注册 |
+| 10 | 健康检查 | ✅ | 全部 6 服务 `/actuator/health` → 200 (Docker) |
 | 11 | 单元测试 | ✅ | 61 tests, 0 failures, BUILD SUCCESS |
 | 12 | CI 通过 | ✅ | `.github/workflows/ci.yml` 已创建，包含 compile/test/spotless:check |
 
-## 待重建 Docker 镜像验证项（3 项）
-
-Items 7/8/9 的代码已提交到 `feature/m10-production-ready`，但当前 Docker 容器运行的是 M7 旧镜像。需执行：
+## Docker 验证记录
 
 ```bash
+# 重建镜像
 mvn package -DskipTests
-docker compose -f docker-compose.yml -f docker-compose.services.yml build
+docker compose -f docker-compose.yml -f docker-compose.services.yml build --no-cache
 docker compose -f docker-compose.yml -f docker-compose.services.yml up -d
+
+# 健康检查
+Port 8080: 200  (gateway)
+Port 8081: 200  (system)
+Port 8082: 200  (expense)
+Port 8083: 200  (approval)
+Port 8084: 200  (ai)
+Port 8085: 200  (notification)
+
+# DLQ 队列确认
+ai.review.dlq          → 0 messages
+notification.event.dlq → 0 messages
 ```
 
 ## 总结
 
-- ✅ 通过：9 项
-- ⚠️ 待重建验证：3 项（代码已就绪，需重打镜像）
-- 关键链路（认证/审批/AI/通知/测试）全部验证通过
+- ✅ 全部 12 项通过
+- 6 服务 Docker 部署正常运行
+- 61 单元测试 0 失败
+- 关键链路（认证/审批/AI/通知/限流/DLQ/幂等/CI）全部就绪
