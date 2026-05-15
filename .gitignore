@@ -28,3 +28,4 @@ volumes/
 # Env
 .env
 *.env.local
+环境变量.txt
