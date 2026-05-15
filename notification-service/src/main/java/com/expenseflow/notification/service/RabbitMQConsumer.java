@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Slf4j
@@ -18,10 +20,23 @@ public class RabbitMQConsumer {
     private final MessageService messageService;
     private final DingTalkService dingTalkService;
     private final ObjectMapper objectMapper;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @RabbitListener(queues = "notification.event.queue")
     public void onNotificationEvent(Map<String, Object> map) {
-        log.info("收到通知事件: {}", map);
+        String eventId = (String) map.get("eventId");
+        if (eventId == null) {
+            log.warn("消息缺少 eventId，跳过处理");
+            return;
+        }
+        Boolean firstTime = stringRedisTemplate.opsForValue()
+            .setIfAbsent("event:consumed:" + eventId, "1", Duration.ofHours(24));
+        if (Boolean.FALSE.equals(firstTime)) {
+            log.info("重复消息已忽略: eventId={}", eventId);
+            return;
+        }
+
+        log.info("收到通知事件: eventId={}", eventId);
         try {
             String eventType = (String) map.getOrDefault("eventType", "unknown");
             String businessType = (String) map.get("businessType");

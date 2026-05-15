@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     public static final String EXCHANGE = "expense.exchange";
+    public static final String DLX = "notification.event.dlx";
     public static final String NOTIFY_QUEUE = "notification.event.queue";
+    public static final String DLQ = "notification.event.dlq";
     public static final String RESULT_KEY = "expense.result.notified";
     public static final String REVIEW_KEY = "ai.review.completed";
 
@@ -25,8 +27,26 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(DLX);
+    }
+
+    @Bean
+    public Queue deadLetterQueue() {
+        return QueueBuilder.durable(DLQ).build();
+    }
+
+    @Bean
+    public Binding dlqBinding() {
+        return BindingBuilder.bind(deadLetterQueue()).to(deadLetterExchange()).with(DLQ);
+    }
+
+    @Bean
     public Queue notifyQueue() {
-        return QueueBuilder.durable(NOTIFY_QUEUE).build();
+        return QueueBuilder.durable(NOTIFY_QUEUE)
+            .withArgument("x-dead-letter-exchange", DLX)
+            .withArgument("x-dead-letter-routing-key", DLQ)
+            .build();
     }
 
     @Bean
