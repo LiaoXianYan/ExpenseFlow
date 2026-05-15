@@ -19,6 +19,9 @@ Thumbs.db
 # Superpowers
 .superpowers/
 
+# Claude Code (local overrides)
+.claude/settings.local.json
+
 # Docker volumes
 volumes/
 
