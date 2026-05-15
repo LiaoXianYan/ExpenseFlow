@@ -27,7 +27,8 @@ public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
 
     private static final List<String> WHITE_LIST = Arrays.asList(
             "/system/auth/login", "/system/auth/refresh", "/system/oauth/",
-            "/actuator/");
+            "/actuator/",
+            "/doc.html", "/v3/api-docs/", "/swagger-resources/", "/webjars/");
     private static final String SECRET = "ExpenseFlow2026SecretKeyForJWTTokenGenerationMustBeLongEnough!!";
 
     private final ReactiveRedisTemplate<String, String> redisTemplate;
@@ -69,10 +70,12 @@ public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
                 if (Boolean.TRUE.equals(isBlacklisted)) {
                     return unauthorized(exchange, "令牌已被注销");
                 }
+                String username = claims.get("username", String.class);
+                if (username == null) username = "";
                 ServerHttpRequest mutated = exchange.getRequest().mutate()
                     .header("X-User-Id", String.valueOf(userId))
                     .header("X-Tenant-Id", String.valueOf(tenantId))
-                    .header("X-Username", "")
+                    .header("X-Username", username)
                     .build();
                 return chain.filter(exchange.mutate().request(mutated).build());
             });

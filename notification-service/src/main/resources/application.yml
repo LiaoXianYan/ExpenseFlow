@@ -33,6 +33,11 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
+dingtalk:
+  mock: false
+  webhook-url: ${DINGTALK_WEBHOOK_URL:}
+  secret: ${DINGTALK_SECRET:}
+
 management:
   endpoints:
     web:

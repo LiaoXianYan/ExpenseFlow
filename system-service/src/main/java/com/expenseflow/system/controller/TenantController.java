@@ -10,11 +10,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/system/tenant")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('SUPER_ADMIN')")
 public class TenantController {
 
     private final SysTenantMapper tenantMapper;

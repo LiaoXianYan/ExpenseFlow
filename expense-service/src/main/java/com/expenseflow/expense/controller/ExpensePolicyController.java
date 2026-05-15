@@ -7,6 +7,7 @@ import com.expenseflow.expense.entity.ExExpensePolicy;
 import com.expenseflow.expense.service.ExpensePolicyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -24,18 +25,21 @@ public class ExpensePolicyController {
 
     @PostMapping
     @AuditLog(module = "费用政策", operation = "CREATE")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','FINANCE')")
     public Result<ExExpensePolicy> create(@Valid @RequestBody ExpensePolicyDTO dto) {
         return policyService.create(dto);
     }
 
     @PutMapping("/{id}")
     @AuditLog(module = "费用政策", operation = "UPDATE")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','FINANCE')")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody ExpensePolicyDTO dto) {
         return policyService.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
     @AuditLog(module = "费用政策", operation = "DELETE")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','FINANCE')")
     public Result<Void> delete(@PathVariable Long id) {
         return policyService.delete(id);
     }

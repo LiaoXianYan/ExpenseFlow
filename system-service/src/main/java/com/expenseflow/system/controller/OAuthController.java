@@ -8,6 +8,8 @@ import com.expenseflow.system.entity.SysUserRole;
 import com.expenseflow.system.mapper.SysOauthUserMapper;
 import com.expenseflow.system.mapper.SysUserMapper;
 import com.expenseflow.system.mapper.SysUserRoleMapper;
+
+import java.util.List;
 import com.expenseflow.system.vo.TokenVO;
 import com.expenseflow.system.vo.UserVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -75,8 +77,8 @@ public class OAuthController {
         }
 
         String tokenId = UUID.randomUUID().toString().replace("-", "");
-        String accessToken = JwtUtil.generateAccessToken(user.getId(), user.getTenantId(), tokenId);
-        String refreshToken = JwtUtil.generateRefreshToken(user.getId(), user.getTenantId(), tokenId);
+        String accessToken = JwtUtil.generateAccessToken(user.getId(), user.getTenantId(), tokenId, List.of("EMPLOYEE"), user.getUsername());
+        String refreshToken = JwtUtil.generateRefreshToken(user.getId(), user.getTenantId(), tokenId, List.of("EMPLOYEE"), user.getUsername());
 
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);

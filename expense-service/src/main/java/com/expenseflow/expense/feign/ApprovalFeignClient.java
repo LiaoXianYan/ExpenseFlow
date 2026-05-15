@@ -2,6 +2,7 @@ package com.expenseflow.expense.feign;
 
 import com.expenseflow.common.result.Result;
 import com.expenseflow.expense.dto.ApprovalStartDTO;
+import com.expenseflow.expense.feign.dto.ApprovalProcessStartResponse;
 import com.expenseflow.expense.feign.fallback.ApprovalFeignFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,5 +13,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface ApprovalFeignClient {
 
     @PostMapping("/process/start")
-    Result<String> startApproval(@RequestBody ApprovalStartDTO dto);
+    Result<ApprovalProcessStartResponse> startApproval(@RequestBody ApprovalStartDTO dto);
 }

@@ -42,7 +42,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/actuator/**", "/expense/callback/**",
+                    "/v3/api-docs/**", "/doc.html", "/swagger-resources/**", "/webjars/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -66,7 +67,10 @@ public class SecurityConfig {
             if (claims != null && !JwtUtil.isExpired(claims)) {
                 Long userId = JwtUtil.getUserId(claims);
                 Long tenantId = JwtUtil.getTenantId(claims);
-                List<SimpleGrantedAuthority> authorities = Collections.emptyList();
+                List<String> roles = JwtUtil.getRoles(claims);
+                List<SimpleGrantedAuthority> authorities = roles.stream()
+                    .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
+                    .toList();
                 UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userId, null, authorities);
                 auth.setDetails(tenantId);

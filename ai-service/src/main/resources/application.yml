@@ -13,6 +13,11 @@ spring:
     password: ${DB_PASSWORD:root}
     hikari:
       maximum-pool-size: 20
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
   cloud:
     nacos:
       discovery:
@@ -37,3 +42,18 @@ management:
     metrics:
       export:
         enabled: true
+
+# ============================================================
+# DeepSeek AI 配置 — 接入真实 API 只需设置环境变量
+#   Windows: set DEEPSEEK_API_KEY=sk-xxxxxxxx
+#   Linux:   export DEEPSEEK_API_KEY=sk-xxxxxxxx
+# 未设置时自动降级为 Java Mock (无需 API Key)
+# ============================================================
+langchain4j:
+  open-ai:
+    chat-model:
+      base-url: https://api.deepseek.com
+      api-key: ${DEEPSEEK_API_KEY:sk-default}
+      model-name: deepseek-chat
+      timeout: 30s
+      max-retries: 2

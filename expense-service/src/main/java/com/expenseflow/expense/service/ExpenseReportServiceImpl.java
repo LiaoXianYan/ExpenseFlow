@@ -20,9 +20,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +39,7 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
     private final ApprovalFeignClient approvalFeignClient;
     private final NoGenerator noGenerator;
     private final PolicyValidator policyValidator;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public Result<Page<ExpenseReportVO>> page(int page, int size, Long applicantId, String status) {
@@ -119,20 +124,38 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
             if (ru != null) user = ru.getData();
         } catch (Exception ignored) {}
 
-        ApprovalStartDTO approvalDTO = new ApprovalStartDTO(
-            "EXPENSE_REPORT", r.getId(), r.getReportNo(),
-            r.getApplicantId(), user != null ? user.getRealName() : "未知");
+        ApprovalStartDTO approvalDTO = new ApprovalStartDTO();
+        approvalDTO.setBusinessType("EXPENSE_REPORT");
+        approvalDTO.setBusinessId(r.getId());
+        approvalDTO.setRequestNo(r.getReportNo());
+        approvalDTO.setApplicantId(r.getApplicantId());
+        approvalDTO.setApplicantName(user != null ? user.getRealName() : "未知");
+        approvalDTO.setAmount(total);
+        approvalDTO.setDepartmentId(r.getDepartmentId());
+
         String processInstanceId;
         try {
-            Result<String> approvalResult = approvalFeignClient.startApproval(approvalDTO);
-            processInstanceId = approvalResult != null ? approvalResult.getData() : null;
+            var approvalResult = approvalFeignClient.startApproval(approvalDTO);
+            processInstanceId = approvalResult != null && approvalResult.getData() != null
+                ? approvalResult.getData().getProcessInstanceId() : null;
         } catch (Exception e) {
-            processInstanceId = "mock-pi-" + java.util.UUID.randomUUID().toString().substring(0, 12);
+            processInstanceId = "fallback-pi-" + java.util.UUID.randomUUID().toString().substring(0, 12);
         }
 
-        r.setStatus("APPROVED");
+        r.setStatus("APPROVING");
         r.setProcessInstanceId(processInstanceId);
         reportMapper.updateById(r);
+
+        // 发布 AI 审单消息
+        Map<String, Object> event = new HashMap<>();
+        event.put("eventId", UUID.randomUUID().toString());
+        event.put("reportId", r.getId());
+        event.put("amount", total);
+        event.put("tenantId", 0);
+        try {
+            rabbitTemplate.convertAndSend("expense.exchange", "expense.report.submitted", event);
+        } catch (Exception ignored) {}
+
         return Result.ok(toVO(r));
     }
 

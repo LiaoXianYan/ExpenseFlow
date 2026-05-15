@@ -1,0 +1,171 @@
+services:
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: ../docker/Dockerfile.java
+      args:
+        JAR_FILE: target/gateway-service-1.0.0-SNAPSHOT.jar
+    container_name: expense-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_DATA_REDIS_HOST: redis
+    depends_on:
+      nacos:
+        condition: service_healthy
+
+  system-service:
+    build:
+      context: ./system-service
+      dockerfile: ../docker/Dockerfile.java
+      args:
+        JAR_FILE: target/system-service-1.0.0-SNAPSHOT.jar
+    container_name: expense-system
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      TZ: Asia/Shanghai
+      DB_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_CONFIG_SERVER-ADDR: nacos:8848
+      SPRING_DATA_REDIS_HOST: redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  expense-service:
+    build:
+      context: ./expense-service
+      dockerfile: ../docker/Dockerfile.java
+      args:
+        JAR_FILE: target/expense-service-1.0.0-SNAPSHOT.jar
+    container_name: expense-expense
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      TZ: Asia/Shanghai
+      DB_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_CONFIG_SERVER-ADDR: nacos:8848
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_RABBITMQ_HOST: rabbitmq
+      OCR_APP_CODE: ${OCR_APP_CODE:-}
+      OCR_APP_KEY: ${OCR_APP_KEY:-}
+      OCR_APP_SECRET: ${OCR_APP_SECRET:-}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  approval-service:
+    build:
+      context: ./approval-service
+      dockerfile: ../docker/Dockerfile.java
+      args:
+        JAR_FILE: target/approval-service-1.0.0-SNAPSHOT.jar
+    container_name: expense-approval
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      TZ: Asia/Shanghai
+      DB_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_CONFIG_SERVER-ADDR: nacos:8848
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_RABBITMQ_HOST: rabbitmq
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: ../docker/Dockerfile.java
+      args:
+        JAR_FILE: target/ai-service-1.0.0-SNAPSHOT.jar
+    container_name: expense-ai
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    environment:
+      TZ: Asia/Shanghai
+      DB_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_CONFIG_SERVER-ADDR: nacos:8848
+      SPRING_RABBITMQ_HOST: rabbitmq
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-sk-default}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: ../docker/Dockerfile.java
+      args:
+        JAR_FILE: target/notification-service-1.0.0-SNAPSHOT.jar
+    container_name: expense-notification
+    restart: unless-stopped
+    ports:
+      - "8085:8085"
+    environment:
+      TZ: Asia/Shanghai
+      DB_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_flow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER-ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_CONFIG_SERVER-ADDR: nacos:8848
+      SPRING_RABBITMQ_HOST: rabbitmq
+      DINGTALK_WEBHOOK_URL: ${DINGTALK_WEBHOOK_URL:-}
+      DINGTALK_SECRET: ${DINGTALK_SECRET:-}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./expense-web
+      dockerfile: ../docker/Dockerfile.web
+    container_name: expense-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - gateway-service
+      - system-service
+      - expense-service
+      - approval-service
+      - ai-service
+      - notification-service

@@ -9,6 +9,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -44,16 +46,28 @@ public class AuditLogAspect {
     @Async
     void saveLog(AuditLog auditLog, long start, String errorMsg) {
         try {
-            String tenantIdStr = request.getHeader("X-Tenant-Id");
-            String userIdStr = request.getHeader("X-User-Id");
-            Long tenantId = tenantIdStr != null ? Long.valueOf(tenantIdStr) : 0L;
-            Long userId = userIdStr != null ? Long.valueOf(userIdStr) : null;
+            // 从 SecurityContext 获取当前用户（不再依赖 header）
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Long userId = null;
+            Long tenantId = 0L;
+            String username = null;
+            if (auth != null && auth.getPrincipal() instanceof Long uid) {
+                userId = uid;
+            }
+            if (auth != null && auth.getDetails() instanceof Long tid) {
+                tenantId = tid;
+            }
+            // 优先从 header 获取（gateway 转发），fallback 到 SecurityContext
+            String headerUserId = request.getHeader("X-User-Id");
+            String headerTenantId = request.getHeader("X-Tenant-Id");
+            if (headerUserId != null) userId = Long.valueOf(headerUserId);
+            if (headerTenantId != null) tenantId = Long.valueOf(headerTenantId);
 
             jdbcTemplate.update(
                 "INSERT INTO sys_audit_log (tenant_id, user_id, username, operation, module, " +
                 "target_type, target_id, request_params, ip, user_agent, duration, create_time) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
-                tenantId, userId, request.getHeader("X-Username"),
+                tenantId, userId, username,
                 auditLog.operation(), auditLog.module(),
                 null, null, sanitizeParams(request.getQueryString()),
                 getClientIp(request), request.getHeader("User-Agent"),

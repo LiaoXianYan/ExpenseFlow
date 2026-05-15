@@ -45,24 +45,25 @@ public class AuthServiceImpl implements AuthService {
             return Result.fail(403, "账号已被禁用");
         }
 
-        String tokenId = UUID.randomUUID().toString().replace("-", "");
-        String accessToken = JwtUtil.generateAccessToken(user.getId(), user.getTenantId(), tokenId);
-        String refreshToken = JwtUtil.generateRefreshToken(user.getId(), user.getTenantId(), tokenId);
-
-        UserVO userVO = toUserVO(user);
-        // Cache user info
-        redisTemplate.opsForValue().set("user:" + user.getId(), userVO, 30, TimeUnit.MINUTES);
-        redisTemplate.opsForValue().set("token:" + tokenId, "1", 2, TimeUnit.HOURS);
-
-        // Cache user permissions
+        // 查询用户角色
+        List<String> roleCodes = Collections.emptyList();
         List<SysUserRole> userRoles = userRoleMapper.selectList(
             new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, user.getId()));
         if (!userRoles.isEmpty()) {
             List<Long> roleIds = userRoles.stream().map(SysUserRole::getRoleId).toList();
             List<SysRole> roles = roleMapper.selectBatchIds(roleIds);
-            Set<String> roleCodes = roles.stream().map(SysRole::getRoleCode).collect(Collectors.toSet());
-            redisTemplate.opsForValue().set("user:perm:" + user.getId(), roleCodes, 30, TimeUnit.MINUTES);
+            roleCodes = roles.stream().map(SysRole::getRoleCode).collect(Collectors.toList());
+            redisTemplate.opsForValue().set("user:perm:" + user.getId(), new HashSet<>(roleCodes), 30, TimeUnit.MINUTES);
         }
+
+        String tokenId = UUID.randomUUID().toString().replace("-", "");
+        String accessToken = JwtUtil.generateAccessToken(user.getId(), user.getTenantId(), tokenId, roleCodes, user.getUsername());
+        String refreshToken = JwtUtil.generateRefreshToken(user.getId(), user.getTenantId(), tokenId, roleCodes, user.getUsername());
+
+        UserVO userVO = toUserVO(user);
+        // Cache user info
+        redisTemplate.opsForValue().set("user:" + user.getId(), userVO, 30, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set("token:" + tokenId, "1", 2, TimeUnit.HOURS);
 
         return Result.ok(new TokenVO(accessToken, refreshToken, 7200, userVO));
     }
@@ -87,16 +88,30 @@ public class AuthServiceImpl implements AuthService {
         }
         Long userId = JwtUtil.getUserId(claims);
         Long tenantId = JwtUtil.getTenantId(claims);
-        String newTokenId = UUID.randomUUID().toString().replace("-", "");
-        String newAccessToken = JwtUtil.generateAccessToken(userId, tenantId, newTokenId);
-        String newRefreshToken = JwtUtil.generateRefreshToken(userId, tenantId, newTokenId);
+        List<String> roleCodes = JwtUtil.getRoles(claims);
 
-        redisTemplate.opsForValue().set("token:" + newTokenId, "1", 2, TimeUnit.HOURS);
-
+        // re-query roles from DB for freshness
+        List<SysUserRole> userRoles = userRoleMapper.selectList(
+            new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userId));
+        if (!userRoles.isEmpty()) {
+            List<Long> roleIds = userRoles.stream().map(SysUserRole::getRoleId).toList();
+            List<SysRole> roles = roleMapper.selectBatchIds(roleIds);
+            roleCodes = roles.stream().map(SysRole::getRoleCode).collect(Collectors.toList());
+        }
         SysUser user = userMapper.selectById(userId);
         if (user == null) {
             return Result.fail(404, "用户不存在");
         }
+
+        if (roleCodes.isEmpty()) {
+            roleCodes = JwtUtil.getRoles(claims); // fallback to JWT claims
+        }
+
+        String newTokenId = UUID.randomUUID().toString().replace("-", "");
+        String newAccessToken = JwtUtil.generateAccessToken(userId, tenantId, newTokenId, roleCodes, user.getUsername());
+        String newRefreshToken = JwtUtil.generateRefreshToken(userId, tenantId, newTokenId, roleCodes, user.getUsername());
+
+        redisTemplate.opsForValue().set("token:" + newTokenId, "1", 2, TimeUnit.HOURS);
         return Result.ok(new TokenVO(newAccessToken, newRefreshToken, 7200, toUserVO(user)));
     }
 

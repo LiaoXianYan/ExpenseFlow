@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 public class OcrConfig {
     private boolean mock = true;
     private String uploadPath = "./upload/invoice";
+    private String endpoint = "https://ocrapi-advanced.aliyuncs.com/rest/160601/ocr/ocr_invoice.json";
+    private String appCode = "";
     private String accessKeyId = "";
     private String accessKeySecret = "";
 }

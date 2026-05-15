@@ -100,18 +100,25 @@ public class TravelRequestServiceImpl implements TravelRequestService {
             if (r != null) user = r.getData();
         } catch (Exception ignored) {}
 
-        ApprovalStartDTO approvalDTO = new ApprovalStartDTO(
-            "TRAVEL_REQUEST", t.getId(), t.getRequestNo(),
-            t.getApplicantId(), user != null ? user.getRealName() : "未知");
+        ApprovalStartDTO approvalDTO = new ApprovalStartDTO();
+        approvalDTO.setBusinessType("TRAVEL_REQUEST");
+        approvalDTO.setBusinessId(t.getId());
+        approvalDTO.setRequestNo(t.getRequestNo());
+        approvalDTO.setApplicantId(t.getApplicantId());
+        approvalDTO.setApplicantName(user != null ? user.getRealName() : "未知");
+        approvalDTO.setAmount(t.getEstimatedAmount());
+        approvalDTO.setDepartmentId(t.getDepartmentId());
+
         String processInstanceId;
         try {
-            Result<String> approvalResult = approvalFeignClient.startApproval(approvalDTO);
-            processInstanceId = approvalResult != null ? approvalResult.getData() : null;
+            var approvalResult = approvalFeignClient.startApproval(approvalDTO);
+            processInstanceId = approvalResult != null && approvalResult.getData() != null
+                ? approvalResult.getData().getProcessInstanceId() : null;
         } catch (Exception e) {
-            processInstanceId = "mock-pi-" + java.util.UUID.randomUUID().toString().substring(0, 12);
+            processInstanceId = "fallback-pi-" + java.util.UUID.randomUUID().toString().substring(0, 12);
         }
 
-        t.setStatus("APPROVED");
+        t.setStatus("APPROVING");
         t.setProcessInstanceId(processInstanceId);
         travelMapper.updateById(t);
         return Result.ok(toVO(t));

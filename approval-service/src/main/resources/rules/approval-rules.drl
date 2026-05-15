@@ -1,0 +1,28 @@
+package com.expenseflow.approval.rules;
+
+import com.expenseflow.approval.dto.RuleInput;
+import com.expenseflow.approval.dto.RuleOutput;
+
+rule "High amount travel request needs director"
+when
+    $input: RuleInput(businessType == "TRAVEL_REQUEST", amount > 5000)
+    $output: RuleOutput()
+then
+    $output.setNeedDirector(true);
+end
+
+rule "High amount expense report warning"
+when
+    $input: RuleInput(businessType == "EXPENSE_REPORT", amount > 10000)
+    $output: RuleOutput()
+then
+    $output.getWarnings().add("报销金额较大，需重点关注");
+end
+
+rule "Very high amount expense report needs extra review"
+when
+    $input: RuleInput(businessType == "EXPENSE_REPORT", amount > 20000)
+    $output: RuleOutput()
+then
+    $output.getWarnings().add("报销金额超过20000，建议总监复核");
+end

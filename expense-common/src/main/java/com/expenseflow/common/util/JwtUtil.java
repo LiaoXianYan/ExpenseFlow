@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class JwtUtil {
@@ -20,20 +20,22 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String generateAccessToken(Long userId, Long tenantId, String tokenId) {
-        return generateToken(userId, tenantId, tokenId, ACCESS_EXPIRE);
+    public static String generateAccessToken(Long userId, Long tenantId, String tokenId, List<String> roles, String username) {
+        return generateToken(userId, tenantId, tokenId, roles, username, ACCESS_EXPIRE);
     }
 
-    public static String generateRefreshToken(Long userId, Long tenantId, String tokenId) {
-        return generateToken(userId, tenantId, tokenId, REFRESH_EXPIRE);
+    public static String generateRefreshToken(Long userId, Long tenantId, String tokenId, List<String> roles, String username) {
+        return generateToken(userId, tenantId, tokenId, roles, username, REFRESH_EXPIRE);
     }
 
-    private static String generateToken(Long userId, Long tenantId, String tokenId, long expire) {
+    private static String generateToken(Long userId, Long tenantId, String tokenId, List<String> roles, String username, long expire) {
         Date now = new Date();
         return Jwts.builder()
                 .id(tokenId)
                 .subject(String.valueOf(userId))
                 .claim("tenantId", tenantId)
+                .claim("roles", roles != null ? roles : Collections.emptyList())
+                .claim("username", username != null ? username : "")
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expire))
                 .signWith(getKey())
@@ -66,6 +68,21 @@ public class JwtUtil {
     public static String getTokenId(Claims claims) {
         if (claims == null) return null;
         return claims.getId();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> getRoles(Claims claims) {
+        if (claims == null) return Collections.emptyList();
+        Object rolesObj = claims.get("roles");
+        if (rolesObj instanceof List<?> list) {
+            return list.stream().map(Object::toString).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    public static String getUsername(Claims claims) {
+        if (claims == null) return null;
+        return claims.get("username", String.class);
     }
 
     public static boolean isExpired(Claims claims) {
