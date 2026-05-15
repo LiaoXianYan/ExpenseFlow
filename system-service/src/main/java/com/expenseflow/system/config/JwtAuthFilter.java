@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,12 @@ import java.util.List;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+    private final RedisTemplate<String, String> redisTemplate;
+
+    public JwtAuthFilter(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -33,6 +40,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
         Claims claims = JwtUtil.parseToken(token);
         if (claims != null && !JwtUtil.isExpired(claims)) {
+            String tokenId = JwtUtil.getTokenId(claims);
+
+            if (tokenId != null
+                    && Boolean.TRUE.equals(redisTemplate.hasKey("token:blacklist:" + tokenId))) {
+                log.warn("Token 已被注销: tokenId={}", tokenId);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             Long userId = JwtUtil.getUserId(claims);
             Long tenantId = JwtUtil.getTenantId(claims);
             List<String> roles = JwtUtil.getRoles(claims);
