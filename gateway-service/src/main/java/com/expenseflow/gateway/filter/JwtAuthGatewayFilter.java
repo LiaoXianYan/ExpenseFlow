@@ -27,7 +27,8 @@ public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
 
     private static final List<String> WHITE_LIST = Arrays.asList(
             "/system/auth/login", "/system/auth/refresh", "/system/oauth/",
-            "/actuator/");
+            "/actuator/",
+            "/doc.html", "/v3/api-docs/", "/swagger-resources/", "/webjars/");
     private static final String SECRET = "ExpenseFlow2026SecretKeyForJWTTokenGenerationMustBeLongEnough!!";
 
     private final ReactiveRedisTemplate<String, String> redisTemplate;
