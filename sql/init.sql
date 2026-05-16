@@ -562,3 +562,25 @@ INSERT INTO ex_expense_policy (tenant_id, policy_name, expense_type, max_amount,
 (0, '住宿费标准-一线', 'HOTEL', 500.00, 500.00, 'TIER1', '2026-01-01', '2027-12-31', 1, NOW()),
 (0, '住宿费标准-其他', 'HOTEL', 350.00, 350.00, 'TIER2', '2026-01-01', '2027-12-31', 1, NOW()),
 (0, '餐费补助', 'MEAL', 100.00, 100.00, 'TIER1', '2026-01-01', '2027-12-31', 1, NOW());
+
+-- 通知模板（P1-3 钉钉推送）
+INSERT INTO nt_notification_template (tenant_id, template_code, template_name, channel, title_template, content_template, status, create_time) VALUES
+(0, 'DING_REPORT_SUBMITTED', '报销提交通知', 'DINGTALK',
+ '📄 报销申请已提交',
+ '**申请人：** {applicantName}\n**单号：** {reportNo}\n**金额：** {amount} 元\n**时间：** {submitTime}',
+ 1, NOW()),
+
+(0, 'DING_APPROVAL_RESULT', '审批结果通知', 'DINGTALK',
+ '📋 审批结果：{outcome}',
+ '**单号：** {requestNo}\n**类型：** {businessType}\n**结果：** {outcome}\n**操作人：** {operator}',
+ 1, NOW()),
+
+(0, 'DING_PAYMENT_COMPLETED', '打款完成通知', 'DINGTALK',
+ '💰 报销款已到账',
+ '**单号：** {reportNo}\n**金额：** {amount} 元\n**打款时间：** {paidTime}',
+ 1, NOW()),
+
+(0, 'DING_REPORT_WITHDRAWN', '报销撤回通知', 'DINGTALK',
+ '↩️ 报销申请已撤回',
+ '**单号：** {reportNo}\n**撤回人：** {applicantName}\n**原状态：** {previousStatus}',
+ 1, NOW());
