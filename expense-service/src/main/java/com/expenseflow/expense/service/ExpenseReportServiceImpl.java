@@ -156,6 +156,10 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
         event.put("reportId", r.getId());
         event.put("amount", total);
         event.put("tenantId", 0);
+        event.put("eventType", "EXPENSE_SUBMITTED");
+        event.put("reportNo", r.getReportNo());
+        event.put("applicantName", user != null ? user.getRealName() : "未知");
+        event.put("submitTime", java.time.LocalDateTime.now().toString());
         try {
             rabbitTemplate.convertAndSend("expense.exchange", "expense.report.submitted", event);
         } catch (Exception ignored) {}
@@ -168,12 +172,26 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
     public Result<ExpenseReportVO> withdraw(Long id) {
         ExExpenseReport r = reportMapper.selectById(id);
         if (r == null) return Result.fail(404, "报销单不存在");
+        String previousStatus = r.getStatus();
         if (!"SUBMITTED".equals(r.getStatus()) && !"APPROVING".equals(r.getStatus())
                 && !"APPROVED".equals(r.getStatus())) {
             return Result.fail(400, "仅已提交/审批中/已审批状态可撤回");
         }
         r.setStatus("WITHDRAWN");
         reportMapper.updateById(r);
+
+        // 发布撤回事件
+        Map<String, Object> event = new HashMap<>();
+        event.put("eventId", UUID.randomUUID().toString());
+        event.put("eventType", "REPORT_WITHDRAWN");
+        event.put("reportNo", r.getReportNo());
+        event.put("applicantId", r.getApplicantId());
+        event.put("previousStatus", previousStatus);
+        event.put("tenantId", 0);
+        try {
+            rabbitTemplate.convertAndSend("expense.exchange", "expense.report.withdrawn", event);
+        } catch (Exception ignored) {}
+
         return Result.ok(toVO(r));
     }
 

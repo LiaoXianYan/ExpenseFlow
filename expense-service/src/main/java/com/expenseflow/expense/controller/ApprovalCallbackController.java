@@ -54,12 +54,13 @@ public class ApprovalCallbackController {
         // 发布审批结果通知事件
         Map<String, Object> event = new HashMap<>();
         event.put("eventId", UUID.randomUUID().toString());
-        event.put("eventType", "approval.result");
+        event.put("eventType", "APPROVAL_RESULT");
         event.put("businessType", businessType);
         event.put("businessId", businessId);
         event.put("outcome", outcome);
         event.put("tenantId", 0);
         if (applicantId != null) event.put("applicantId", applicantId);
+        event.put("requestNo", getRequestNo(businessType, businessId));
         try {
             rabbitTemplate.convertAndSend("expense.exchange", "expense.result.notified", event);
             log.info("RabbitMQ 消息已发送: expense.result.notified, businessId={}", businessId);
@@ -73,5 +74,16 @@ public class ApprovalCallbackController {
     private Long longValue(Object obj) {
         if (obj instanceof Number) return ((Number) obj).longValue();
         return null;
+    }
+
+    private String getRequestNo(String businessType, Long businessId) {
+        if ("TRAVEL_REQUEST".equals(businessType)) {
+            ExTravelRequest t = travelMapper.selectById(businessId);
+            return t != null ? t.getRequestNo() : String.valueOf(businessId);
+        } else if ("EXPENSE_REPORT".equals(businessType)) {
+            ExExpenseReport r = reportMapper.selectById(businessId);
+            return r != null ? r.getReportNo() : String.valueOf(businessId);
+        }
+        return String.valueOf(businessId);
     }
 }
