@@ -9,6 +9,7 @@ import com.expenseflow.approval.feign.dto.InvoiceDTO;
 import com.expenseflow.approval.service.ApprovalProcessService;
 import com.expenseflow.approval.service.DroolsRuleService;
 import com.expenseflow.common.exception.BusinessException;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RuntimeService;
@@ -28,6 +29,7 @@ public class ApprovalProcessServiceImpl implements ApprovalProcessService {
     private final ExpenseFeignClient expenseFeignClient;
 
     @Override
+    @SentinelResource(value = "approval_process_start", fallback = "startProcessFallback")
     public ProcessStartResponse startProcess(ApprovalStartDTO dto) {
         // 1. 组装 RuleInput
         RuleInput ruleInput = new RuleInput();
@@ -145,5 +147,12 @@ public class ApprovalProcessServiceImpl implements ApprovalProcessService {
 
         String approvalLevel = rule.isNeedDirector() ? "DUAL" : "SINGLE";
         return new ProcessStartResponse(pi.getId(), approvalLevel, rule.getWarnings());
+    }
+
+    public ProcessStartResponse startProcessFallback(ApprovalStartDTO dto, Throwable t) {
+        log.warn("审批流程启动触发 Sentinel 降级: businessType={}, error={}",
+            dto.getBusinessType(), t.getMessage());
+        return new ProcessStartResponse("fallback-" + java.util.UUID.randomUUID(),
+            "SINGLE", java.util.List.of("审批服务繁忙"));
     }
 }
