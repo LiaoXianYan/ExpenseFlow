@@ -2,8 +2,8 @@
   <div class="page">
     <div class="page-header">
       <div>
-        <h2><el-icon style="margin-right:6px"><Bell /></el-icon>消息通知</h2>
-        <p class="subtitle">站内消息与系统通知</p>
+        <h2><el-icon style="margin-right:6px"><Bell /></el-icon>消息中心</h2>
+        <p class="subtitle">站内消息与钉钉通知</p>
       </div>
       <el-button type="primary" plain size="default" @click="handleMarkAll" :disabled="tableData.length===0">
         全部已读

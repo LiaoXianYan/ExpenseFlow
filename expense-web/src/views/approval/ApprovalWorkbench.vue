@@ -2,7 +2,7 @@
   <div class="page">
     <div class="page-header">
       <div>
-        <h2><el-icon style="margin-right:6px"><Checked /></el-icon>审批工作台</h2>
+        <h2><el-icon style="margin-right:6px"><Checked /></el-icon>审批中心</h2>
         <p class="subtitle">处理待审批的出差申请与报销单</p>
       </div>
     </div>

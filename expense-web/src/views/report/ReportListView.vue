@@ -2,11 +2,11 @@
   <div class="page">
     <div class="page-header">
       <div>
-        <h2><el-icon style="margin-right:6px"><Document /></el-icon>报销管理</h2>
-        <p class="subtitle">管理所有报销单</p>
+        <h2><el-icon style="margin-right:6px"><Document /></el-icon>费用报销</h2>
+        <p class="subtitle">管理所有费用报销</p>
       </div>
       <el-button type="primary" size="large" @click="$router.push('/report/create')">
-        <el-icon style="margin-right:4px"><Plus /></el-icon>新建报销单
+        <el-icon style="margin-right:4px"><Plus /></el-icon>提交报销
       </el-button>
     </div>
 

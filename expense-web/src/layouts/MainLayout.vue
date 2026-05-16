@@ -17,33 +17,33 @@
         </el-menu-item>
 
         <el-sub-menu index="travel">
-          <template #title><el-icon><Promotion /></el-icon><span>出差申请</span></template>
-          <el-menu-item index="/travel">申请列表</el-menu-item>
-          <el-menu-item index="/travel/create">新建申请</el-menu-item>
+          <template #title><el-icon><Promotion /></el-icon><span>差旅出行</span></template>
+          <el-menu-item index="/travel">我的行程</el-menu-item>
+          <el-menu-item index="/travel/create">新建出差</el-menu-item>
         </el-sub-menu>
 
         <el-sub-menu index="report">
-          <template #title><el-icon><Document /></el-icon><span>报销管理</span></template>
-          <el-menu-item index="/report">报销列表</el-menu-item>
-          <el-menu-item index="/report/create">新建报销</el-menu-item>
+          <template #title><el-icon><Document /></el-icon><span>费用报销</span></template>
+          <el-menu-item index="/report">我的报销</el-menu-item>
+          <el-menu-item index="/report/create">提交报销</el-menu-item>
         </el-sub-menu>
 
         <el-menu-item index="/invoice">
-          <el-icon><Picture /></el-icon><span>发票管理</span>
+          <el-icon><Picture /></el-icon><span>票据管理</span>
         </el-menu-item>
 
         <el-menu-item index="/approval">
-          <el-icon><Checked /></el-icon><span>审批工作台</span>
+          <el-icon><Checked /></el-icon><span>审批中心</span>
         </el-menu-item>
 
         <el-sub-menu index="ai">
-          <template #title><el-icon><Cpu /></el-icon><span>AI 能力</span></template>
-          <el-menu-item index="/ai-review">AI 审单</el-menu-item>
-          <el-menu-item index="/ai-assistant">AI 助手</el-menu-item>
+          <template #title><el-icon><Cpu /></el-icon><span>智能服务</span></template>
+          <el-menu-item index="/ai-review">智能审单</el-menu-item>
+          <el-menu-item index="/ai-assistant">政策问答</el-menu-item>
         </el-sub-menu>
 
         <el-menu-item index="/notification">
-          <el-icon><Bell /></el-icon><span>消息通知</span>
+          <el-icon><Bell /></el-icon><span>消息中心</span>
         </el-menu-item>
       </el-menu>
 

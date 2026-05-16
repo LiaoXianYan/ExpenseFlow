@@ -2,8 +2,8 @@
   <div class="page">
     <div class="page-header">
       <div>
-        <h2><el-icon style="margin-right:6px"><Picture /></el-icon>发票管理</h2>
-        <p class="subtitle">上传发票并自动 OCR 识别</p>
+        <h2><el-icon style="margin-right:6px"><Picture /></el-icon>票据管理</h2>
+        <p class="subtitle">上传票据并自动 OCR 识别</p>
       </div>
       <el-upload :http-request="handleUpload" accept=".png,.jpg,.jpeg,.pdf" :limit="1">
         <el-button type="primary" size="large"><el-icon style="margin-right:4px"><Upload /></el-icon>上传发票</el-button>

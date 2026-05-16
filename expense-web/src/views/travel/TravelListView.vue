@@ -2,11 +2,11 @@
   <div class="page">
     <div class="page-header">
       <div>
-        <h2><el-icon style="margin-right:6px"><Promotion /></el-icon>出差申请</h2>
-        <p class="subtitle">管理所有出差申请记录</p>
+        <h2><el-icon style="margin-right:6px"><Promotion /></el-icon>差旅出行</h2>
+        <p class="subtitle">管理所有差旅出行记录</p>
       </div>
       <el-button type="primary" size="large" @click="$router.push('/travel/create')">
-        <el-icon style="margin-right:4px"><Plus /></el-icon>新建申请
+        <el-icon style="margin-right:4px"><Plus /></el-icon>新建出差
       </el-button>
     </div>
 
