@@ -29,3 +29,5 @@ volumes/
 .env
 *.env.local
 环境变量.txt
+.test_screenshots/
+.test_screenshots/
