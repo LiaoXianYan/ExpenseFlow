@@ -21,7 +21,9 @@ public class DroolsRuleService {
     }
 
     public RuleOutput evaluate(String businessType, BigDecimal amount) {
-        RuleInput input = new RuleInput(businessType, amount != null ? amount.doubleValue() : 0);
+        RuleInput input = new RuleInput();
+        input.setBusinessType(businessType);
+        input.setAmount(amount != null ? amount.doubleValue() : 0);
         RuleOutput output = new RuleOutput();
 
         if (kieContainer != null) {
