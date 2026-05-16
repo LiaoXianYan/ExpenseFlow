@@ -15,6 +15,9 @@ public class RabbitMQConfig {
     public static final String DLQ = "notification.event.dlq";
     public static final String RESULT_KEY = "expense.result.notified";
     public static final String REVIEW_KEY = "ai.review.completed";
+    public static final String SUBMITTED_KEY = "expense.report.submitted";
+    public static final String WITHDRAWN_KEY = "expense.report.withdrawn";
+    public static final String PAYMENT_KEY = "expense.payment.completed";
 
     @Bean
     public MessageConverter messageConverter() {
@@ -57,5 +60,20 @@ public class RabbitMQConfig {
     @Bean
     public Binding reviewCompletedBinding() {
         return BindingBuilder.bind(notifyQueue()).to(expenseExchange()).with(REVIEW_KEY);
+    }
+
+    @Bean
+    public Binding submittedBinding() {
+        return BindingBuilder.bind(notifyQueue()).to(expenseExchange()).with(SUBMITTED_KEY);
+    }
+
+    @Bean
+    public Binding withdrawnBinding() {
+        return BindingBuilder.bind(notifyQueue()).to(expenseExchange()).with(WITHDRAWN_KEY);
+    }
+
+    @Bean
+    public Binding paymentBinding() {
+        return BindingBuilder.bind(notifyQueue()).to(expenseExchange()).with(PAYMENT_KEY);
     }
 }
