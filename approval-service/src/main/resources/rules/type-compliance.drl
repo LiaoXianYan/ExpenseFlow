@@ -1,0 +1,43 @@
+package com.expenseflow.approval.rules;
+
+import com.expenseflow.approval.dto.RuleInput;
+import com.expenseflow.approval.dto.RuleOutput;
+import com.expenseflow.approval.dto.RuleOutput.Violation;
+import com.expenseflow.approval.dto.ExpenseItemInput;
+import com.expenseflow.approval.dto.PolicyInput;
+
+rule "Expense type not covered by any policy"
+when
+    $item: ExpenseItemInput($type: expenseType)
+    not PolicyInput(expenseType == $type)
+    $output: RuleOutput()
+then
+    $output.getViolations().add(new Violation("TYPE_MISMATCH",
+        "费用类型 " + $type + " 不在现行政策范围内", "BLOCK"));
+end
+
+rule "Item exceeds policy max amount"
+when
+    $item: ExpenseItemInput($type: expenseType, $amt: amount)
+    $policy: PolicyInput(expenseType == $type, $amt > maxAmount)
+    $output: RuleOutput()
+then
+    $output.getViolations().add(new Violation("POLICY_VIOLATION",
+        $type + " 金额 " + $amt + " 超过政策上限 " + $policy.getMaxAmount(), "BLOCK"));
+end
+
+rule "Daily limit exceeded for same expense type"
+when
+    $item: ExpenseItemInput($type: expenseType, $date: expenseDate)
+    $policy: PolicyInput(expenseType == $type, dailyLimit > 0)
+    $input: RuleInput()
+    $output: RuleOutput()
+then
+    double dailySum = $input.getItems().stream()
+        .filter(i -> i.getExpenseType().equals($type) && i.getExpenseDate().equals($date))
+        .mapToDouble(ExpenseItemInput::getAmount).sum();
+    if (dailySum > $policy.getDailyLimit()) {
+        $output.getViolations().add(new Violation("POLICY_VIOLATION",
+            $type + " 当日合计 " + dailySum + " 超过日限额 " + $policy.getDailyLimit(), "WARN"));
+    }
+end

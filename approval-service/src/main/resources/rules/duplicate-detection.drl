@@ -1,0 +1,26 @@
+package com.expenseflow.approval.rules;
+
+import com.expenseflow.approval.dto.RuleInput;
+import com.expenseflow.approval.dto.RuleOutput;
+import com.expenseflow.approval.dto.RuleOutput.Violation;
+import com.expenseflow.approval.dto.InvoiceInput;
+import com.expenseflow.approval.dto.ApplicantHistory;
+
+rule "Duplicate invoice number"
+when
+    $inv: InvoiceInput(invoiceNo != null, invoiceNo != "", $no: invoiceNo)
+    $history: ApplicantHistory(usedInvoiceNos contains $no)
+    $output: RuleOutput()
+then
+    $output.getViolations().add(new Violation("DUPLICATE",
+        "发票号 " + $no + " 已关联过其他报销单", "BLOCK"));
+end
+
+rule "Duplicate by amount + date + vendor"
+when
+    $history: ApplicantHistory(hasAmountDateVendorMatch == true)
+    $output: RuleOutput()
+then
+    $output.getViolations().add(new Violation("DUPLICATE",
+        "相同金额+日期+销方的发票已存在", "WARN"));
+end

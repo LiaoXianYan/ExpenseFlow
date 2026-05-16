@@ -1,0 +1,35 @@
+package com.expenseflow.approval.rules;
+
+import com.expenseflow.approval.dto.RuleInput;
+import com.expenseflow.approval.dto.RuleOutput;
+import com.expenseflow.approval.dto.RuleOutput.Violation;
+import com.expenseflow.approval.dto.ExpenseItemInput;
+import com.expenseflow.approval.dto.ApplicantHistory;
+
+rule "Amount deviates significantly from historical average"
+when
+    $item: ExpenseItemInput($type: expenseType, $amt: amount)
+    $history: ApplicantHistory(avgAmount > 0, $amt > avgAmount * 3)
+    $output: RuleOutput()
+then
+    $output.getViolations().add(new Violation("ANOMALY",
+        $type + " 金额 " + $amt + " 远超历史均值 " + $history.getAvgAmount(), "WARN"));
+end
+
+rule "High frequency reports in recent period"
+when
+    $history: ApplicantHistory(recentReportCount >= 5)
+    $output: RuleOutput()
+then
+    $output.getViolations().add(new Violation("ANOMALY",
+        "近30天已有 " + $history.getRecentReportCount() + " 笔报销，频率偏高", "WARN"));
+end
+
+rule "Suspected split reporting"
+when
+    $history: ApplicantHistory(suspectedSplit == true)
+    $output: RuleOutput()
+then
+    $output.getViolations().add(new Violation("ANOMALY",
+        "疑似拆单报销：高频低额", "WARN"));
+end
