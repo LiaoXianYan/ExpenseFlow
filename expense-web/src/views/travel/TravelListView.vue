@@ -22,7 +22,7 @@
             <el-button size="small" @click="$router.push(`/travel/${row.id}/edit`)" v-if="row.status==='DRAFT'||row.status==='WITHDRAWN'">编辑</el-button>
             <el-button size="small" type="success" @click="handleSubmit(row)" v-if="row.status==='DRAFT'">提交</el-button>
             <el-button size="small" type="warning" @click="handleWithdraw(row)" v-if="row.status==='APPROVING'||row.status==='SUBMITTED'">撤回</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row)" v-if="row.status==='DRAFT'">删除</el-button>
+            <el-button size="small" type="danger" v-permission="['FINANCE','SUPER_ADMIN']" @click="handleDelete(row)" v-if="row.status==='DRAFT'">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

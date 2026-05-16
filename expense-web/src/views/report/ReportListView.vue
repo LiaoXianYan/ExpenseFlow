@@ -22,7 +22,7 @@
             <el-button size="small" @click="$router.push(`/report/${row.id}/edit`)" v-if="row.status==='DRAFT'">编辑</el-button>
             <el-button size="small" type="success" @click="handleSubmit(row)" v-if="row.status==='DRAFT'">提交</el-button>
             <el-button size="small" type="primary" @click="handlePay(row)" v-if="row.status==='APPROVED'">打款</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row)" v-if="row.status==='DRAFT'">删除</el-button>
+            <el-button size="small" type="danger" v-permission="['FINANCE','SUPER_ADMIN']" @click="handleDelete(row)" v-if="row.status==='DRAFT'">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

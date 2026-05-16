@@ -16,9 +16,9 @@
         <el-table-column prop="applicantName" label="申请人" width="100" />
         <el-table-column label="操作" width="400">
           <template #default="{ row }">
-            <el-button size="small" type="success" @click="handleAction(row, 'APPROVE')">通过</el-button>
-            <el-button size="small" type="danger" @click="handleAction(row, 'REJECT')">驳回</el-button>
-            <el-button size="small" type="warning" @click="showDelegate(row)">委派</el-button>
+            <el-button size="small" type="success" v-permission="'approval:approve'" @click="handleAction(row, 'APPROVE')">通过</el-button>
+            <el-button size="small" type="danger" v-permission="'approval:reject'" @click="handleAction(row, 'REJECT')">驳回</el-button>
+            <el-button size="small" type="warning" v-permission="['FINANCE','SUPER_ADMIN']" @click="showDelegate(row)">委派</el-button>
           </template>
         </el-table-column>
       </el-table>
