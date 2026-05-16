@@ -29,7 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExpenseReportServiceImpl implements ExpenseReportService {
@@ -103,6 +106,7 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
     }
 
     @Override
+    @SentinelResource(value = "expense_report_submit", fallback = "submitFallback")
     @Transactional
     public Result<ExpenseReportVO> submit(Long id) {
         ExExpenseReport r = reportMapper.selectById(id);
@@ -291,6 +295,11 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
         dto.setHasAmountDateVendorMatch(false);
 
         return Result.ok(dto);
+    }
+
+    public Result<ExpenseReportVO> submitFallback(Long id, Throwable t) {
+        log.warn("报销提交触发 Sentinel 降级: id={}, error={}", id, t.getMessage());
+        return Result.fail(429, "系统繁忙，请稍后重试");
     }
 
     private ExpenseReportVO toVO(ExExpenseReport r) {
