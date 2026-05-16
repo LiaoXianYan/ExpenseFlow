@@ -8,6 +8,7 @@ import com.expenseflow.ai.service.DeepSeekReviewService;
 import com.expenseflow.ai.vo.ReviewResultVO;
 import com.expenseflow.ai.vo.RiskReportVO;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -27,6 +28,7 @@ public class DeepSeekReviewServiceImpl implements DeepSeekReviewService {
     private final ChatLanguageModel chatModel;
 
     @Override
+    @SentinelResource(value = "ai_review", fallback = "reviewFallback")
     public ReviewResultVO review(ReviewRequestDTO dto, Long tenantId) {
         long start = System.currentTimeMillis();
 
@@ -106,6 +108,16 @@ public class DeepSeekReviewServiceImpl implements DeepSeekReviewService {
         if (response.contains("REVIEW_NEEDED")) return "REVIEW_NEEDED";
         if (response.contains("REJECTED")) return "REJECTED";
         return "APPROVED";
+    }
+
+    public ReviewResultVO reviewFallback(ReviewRequestDTO dto, Long tenantId, Throwable t) {
+        log.warn("AI 审单触发 Sentinel 降级: error={}", t.getMessage());
+        ReviewResultVO vo = new ReviewResultVO();
+        vo.setReviewResult("APPROVED");
+        vo.setRiskLevel("LOW");
+        vo.setConfidence(java.math.BigDecimal.ZERO);
+        vo.setModel("sentinel-fallback");
+        return vo;
     }
 
     private String extractRiskLevel(String response) {
