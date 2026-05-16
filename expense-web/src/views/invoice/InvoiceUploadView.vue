@@ -1,37 +1,49 @@
 <template>
   <div class="page">
-    <el-card>
-      <template #header>发票管理</template>
+    <div class="page-header">
+      <div>
+        <h2><el-icon style="margin-right:6px"><Picture /></el-icon>发票管理</h2>
+        <p class="subtitle">上传发票并自动 OCR 识别</p>
+      </div>
       <el-upload :http-request="handleUpload" accept=".png,.jpg,.jpeg,.pdf" :limit="1">
-        <el-button type="primary">上传发票</el-button>
-        <template #tip><div class="tip">支持 PNG/JPG/PDF，最大 10MB</div></template>
+        <el-button type="primary" size="large"><el-icon style="margin-right:4px"><Upload /></el-icon>上传发票</el-button>
+        <template #tip><div class="upload-tip">支持 PNG / JPG / PDF，最大 10MB</div></template>
       </el-upload>
+    </div>
 
-      <el-table :data="tableData" stripe v-loading="loading" style="margin-top:16px">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="invoiceNo" label="发票号" width="160" />
-        <el-table-column prop="totalAmount" label="金额" width="100" />
-        <el-table-column prop="sellerName" label="销售方" />
+    <el-card class="table-card">
+      <el-table :data="tableData" stripe v-loading="loading" class="data-table">
+        <el-table-column prop="id" label="ID" width="70" />
+        <el-table-column prop="invoiceNo" label="发票号" width="170" />
+        <el-table-column prop="totalAmount" label="金额" width="110">
+          <template #default="{ row }"><span class="amount">&yen;{{ row.totalAmount }}</span></template>
+        </el-table-column>
+        <el-table-column prop="sellerName" label="销售方" min-width="180" />
         <el-table-column prop="ocrStatus" label="OCR" width="100">
-          <template #default="{ row }"><el-tag :type="row.ocrStatus==='SUCCESS'?'success':row.ocrStatus==='FAILED'?'danger':'warning'">{{ row.ocrStatus }}</el-tag></template>
+          <template #default="{ row }">
+            <el-tag :type="row.ocrStatus==='SUCCESS'?'success':row.ocrStatus==='FAILED'?'danger':'warning'" effect="plain">{{ row.ocrStatus || 'PENDING' }}</el-tag>
+          </template>
         </el-table-column>
         <el-table-column prop="ocrConfidence" label="置信度" width="90" />
         <el-table-column label="操作" width="120">
           <template #default="{ row }">
-            <el-button size="small" @click="handleOcr(row)">OCR 识别</el-button>
+            <el-button size="small" type="primary" @click="handleOcr(row)">OCR 识别</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination v-model:current-page="page" :total="total" :page-size="10" layout="prev,pager,next,total" @change="loadData" style="margin-top:16px;justify-content:flex-end" />
+      <div class="pagination-wrap">
+        <el-pagination v-model:current-page="page" :total="total" :page-size="10" layout="prev,pager,next,total" @change="loadData" background />
+      </div>
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { uploadInvoice, getInvoiceList, triggerOcr, getInvoiceDetail } from '../../api/invoice'
+import { uploadInvoice, getInvoiceList } from '../../api/invoice'
 import { triggerOcrRecognition } from '../../api/ai'
 import { ElMessage } from 'element-plus'
+import { Upload } from '@element-plus/icons-vue'
 
 const tableData = ref([]); const loading = ref(false); const page = ref(1); const total = ref(0)
 
@@ -50,4 +62,13 @@ async function handleOcr(row: any) {
 }
 </script>
 
-<style scoped>.page { padding: 0; } .tip { color: #999; font-size: 12px; margin-top: 4px; }</style>
+<style scoped>
+.page { max-width: 1200px; }
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.page-header h2 { font-size: 22px; font-weight: 700; color: #1E3A5F; display: flex; align-items: center; margin: 0; }
+.subtitle { color: #94a3b8; font-size: 13px; margin: 4px 0 0; }
+.table-card { border-radius: 14px; }
+.pagination-wrap { display: flex; justify-content: flex-end; margin-top: 16px; }
+.amount { font-weight: 600; color: #1E3A5F; }
+.upload-tip { color: #94a3b8; font-size: 12px; margin-top: 6px; }
+</style>
