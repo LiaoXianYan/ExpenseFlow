@@ -133,7 +133,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.dashboard { max-width: 1200px; }
+.dashboard { }
 
 .welcome-card {
   background: linear-gradient(135deg, #1E3A5F 0%, #3B82F6 100%);

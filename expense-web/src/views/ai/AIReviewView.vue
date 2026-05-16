@@ -83,7 +83,7 @@ async function handleReview() {
 </script>
 
 <style scoped>
-.page { max-width: 1000px; }
+.page {  }
 .page-header { margin-bottom: 20px; }
 .page-header h2 { font-size: 22px; font-weight: 700; color: #1E3A5F; display: flex; align-items: center; margin: 0; }
 .subtitle { color: #94a3b8; font-size: 13px; margin: 4px 0 0; }
