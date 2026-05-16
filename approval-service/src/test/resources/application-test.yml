@@ -1,0 +1,53 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 1000
+            read-timeout: 1000
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      - org.flowable.spring.boot.ProcessEngineAutoConfiguration
+      - org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration
+      - org.flowable.spring.boot.app.AppEngineAutoConfiguration
+      - org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration
+      - org.flowable.spring.boot.idm.IdmEngineAutoConfiguration
+      - org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration
+      - org.flowable.spring.boot.cmmn.CmmnEngineAutoConfiguration
+      - org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration
+      - org.flowable.spring.boot.dmn.DmnEngineAutoConfiguration
+      - org.flowable.spring.boot.dmn.DmnEngineServicesAutoConfiguration
+      - org.flowable.spring.boot.eventregistry.EventRegistryAutoConfiguration
+      - org.flowable.spring.boot.eventregistry.EventRegistryServicesAutoConfiguration
+      - org.flowable.spring.boot.EndpointAutoConfiguration
+      - org.flowable.spring.boot.RestApiAutoConfiguration
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
+    username: sa
+    password:
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-h2.sql
+  rabbitmq:
+    listener:
+      auto-startup: false
+  main:
+    allow-bean-definition-overriding: true
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
