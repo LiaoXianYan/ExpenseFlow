@@ -1,6 +1,7 @@
 package com.expenseflow.expense.service.impl;
 
 import com.expenseflow.common.result.Result;
+import com.expenseflow.expense.dto.ApplicantHistoryDTO;
 import com.expenseflow.expense.dto.ApprovalStartDTO;
 import com.expenseflow.expense.dto.ExpenseItemDTO;
 import com.expenseflow.expense.dto.ExpenseReportDTO;
@@ -15,6 +16,7 @@ import com.expenseflow.expense.util.NoGenerator;
 import com.expenseflow.expense.util.PolicyValidator;
 import com.expenseflow.expense.vo.ExpenseItemVO;
 import com.expenseflow.expense.vo.ExpenseReportVO;
+import com.expenseflow.expense.vo.InvoiceVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,8 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
 
     private final ExExpenseReportMapper reportMapper;
     private final ExExpenseItemMapper itemMapper;
+    private final ExInvoiceMapper invoiceMapper;
+    private final ExCostRecordMapper costRecordMapper;
     private final ExTravelRequestMapper travelMapper;
     private final SystemFeignClient systemFeignClient;
     private final ApprovalFeignClient approvalFeignClient;
@@ -193,6 +197,82 @@ public class ExpenseReportServiceImpl implements ExpenseReportService {
         reportMapper.updateById(r);
 
         return Result.ok(toVO(r));
+    }
+
+    @Override
+    public Result<List<ExpenseItemVO>> getItemsByReportId(Long reportId) {
+        List<ExExpenseItem> items = itemMapper.selectList(
+            new LambdaQueryWrapper<ExExpenseItem>().eq(ExExpenseItem::getReportId, reportId));
+        List<ExpenseItemVO> vos = items.stream().map(i -> {
+            ExpenseItemVO vo = new ExpenseItemVO();
+            BeanUtils.copyProperties(i, vo);
+            return vo;
+        }).toList();
+        return Result.ok(vos);
+    }
+
+    @Override
+    public Result<List<InvoiceVO>> getInvoicesByReportId(Long reportId) {
+        List<ExExpenseItem> items = itemMapper.selectList(
+            new LambdaQueryWrapper<ExExpenseItem>().eq(ExExpenseItem::getReportId, reportId));
+        List<Long> invoiceIds = items.stream()
+            .map(ExExpenseItem::getInvoiceId).filter(id -> id != null).distinct().toList();
+        if (invoiceIds.isEmpty()) return Result.ok(List.of());
+        List<ExInvoice> invoices = invoiceMapper.selectBatchIds(invoiceIds);
+        List<InvoiceVO> vos = invoices.stream().map(i -> {
+            InvoiceVO vo = new InvoiceVO();
+            BeanUtils.copyProperties(i, vo);
+            return vo;
+        }).toList();
+        return Result.ok(vos);
+    }
+
+    @Override
+    public Result<ApplicantHistoryDTO> getApplicantHistory(Long applicantId) {
+        ApplicantHistoryDTO dto = new ApplicantHistoryDTO();
+        dto.setApplicantId(applicantId);
+
+        java.time.LocalDate thirtyDaysAgo = java.time.LocalDate.now().minusDays(30);
+
+        long recentCount = reportMapper.selectCount(new LambdaQueryWrapper<ExExpenseReport>()
+            .eq(ExExpenseReport::getApplicantId, applicantId)
+            .ge(ExExpenseReport::getReportDate, thirtyDaysAgo));
+        dto.setRecentReportCount((int) recentCount);
+
+        List<ExExpenseReport> allReports = reportMapper.selectList(
+            new LambdaQueryWrapper<ExExpenseReport>()
+                .eq(ExExpenseReport::getApplicantId, applicantId));
+        double avg = allReports.stream()
+            .mapToDouble(r -> r.getTotalAmount() != null ? r.getTotalAmount().doubleValue() : 0)
+            .average().orElse(0);
+        dto.setAvgAmount(avg);
+
+        List<Long> allReportIds = allReports.stream().map(ExExpenseReport::getId).toList();
+        List<String> usedInvoiceNos = new java.util.ArrayList<>();
+        List<Long> usedCostRecordIds = new java.util.ArrayList<>();
+        if (!allReportIds.isEmpty()) {
+            List<ExExpenseItem> allItems = itemMapper.selectList(
+                new LambdaQueryWrapper<ExExpenseItem>().in(ExExpenseItem::getReportId, allReportIds));
+            List<Long> allInvoiceIds = allItems.stream()
+                .map(ExExpenseItem::getInvoiceId).filter(id -> id != null).distinct().toList();
+            if (!allInvoiceIds.isEmpty()) {
+                List<ExInvoice> allInvoices = invoiceMapper.selectBatchIds(allInvoiceIds);
+                usedInvoiceNos = allInvoices.stream()
+                    .map(ExInvoice::getInvoiceNo).filter(no -> no != null && !no.isEmpty()).toList();
+            }
+            usedCostRecordIds = costRecordMapper.selectList(
+                new LambdaQueryWrapper<ExCostRecord>()
+                    .isNotNull(ExCostRecord::getReportId)
+                    .in(ExCostRecord::getReportId, allReportIds))
+                .stream().map(ExCostRecord::getId).toList();
+        }
+        dto.setUsedInvoiceNos(usedInvoiceNos);
+        dto.setUsedCostRecordIds(usedCostRecordIds);
+
+        dto.setSuspectedSplit(recentCount >= 5 && avg > 0);
+        dto.setHasAmountDateVendorMatch(false);
+
+        return Result.ok(dto);
     }
 
     private ExpenseReportVO toVO(ExExpenseReport r) {

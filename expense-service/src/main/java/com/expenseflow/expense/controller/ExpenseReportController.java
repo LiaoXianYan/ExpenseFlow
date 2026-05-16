@@ -2,13 +2,18 @@ package com.expenseflow.expense.controller;
 
 import com.expenseflow.common.annotation.AuditLog;
 import com.expenseflow.common.result.Result;
+import com.expenseflow.expense.dto.ApplicantHistoryDTO;
 import com.expenseflow.expense.dto.ExpenseReportDTO;
 import com.expenseflow.expense.service.ExpenseReportService;
+import com.expenseflow.expense.vo.ExpenseItemVO;
 import com.expenseflow.expense.vo.ExpenseReportVO;
+import com.expenseflow.expense.vo.InvoiceVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/expense/report")
@@ -59,5 +64,20 @@ public class ExpenseReportController extends BaseController {
     @AuditLog(module = "报销单", operation = "WITHDRAW")
     public Result<ExpenseReportVO> withdraw(@PathVariable Long id) {
         return reportService.withdraw(id);
+    }
+
+    @GetMapping("/{id}/items")
+    public Result<List<ExpenseItemVO>> getItems(@PathVariable Long id) {
+        return reportService.getItemsByReportId(id);
+    }
+
+    @GetMapping("/{id}/invoices")
+    public Result<List<InvoiceVO>> getInvoices(@PathVariable Long id) {
+        return reportService.getInvoicesByReportId(id);
+    }
+
+    @GetMapping("/applicant/{applicantId}/history")
+    public Result<ApplicantHistoryDTO> getApplicantHistory(@PathVariable Long applicantId) {
+        return reportService.getApplicantHistory(applicantId);
     }
 }
