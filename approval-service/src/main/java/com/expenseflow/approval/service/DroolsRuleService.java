@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -95,6 +98,28 @@ public class DroolsRuleService {
                             output.getViolations().add(new Violation("POLICY_VIOLATION",
                                 item.getExpenseType() + " 金额 " + item.getAmount()
                                     + " 超过政策上限 " + p.getMaxAmount(), "BLOCK"));
+                        }
+                    }
+                }
+            }
+
+            // Daily limit check: sum amounts by type+date, compare against dailyLimit
+            Map<String, Map<LocalDate, Double>> dailySums = new HashMap<>();
+            for (ExpenseItemInput item : input.getItems()) {
+                if (item.getExpenseDate() != null) {
+                    dailySums
+                        .computeIfAbsent(item.getExpenseType(), k -> new HashMap<>())
+                        .merge(item.getExpenseDate(), item.getAmount(), Double::sum);
+                }
+            }
+            for (PolicyInput p : input.getPolicies()) {
+                Map<LocalDate, Double> dateMap = dailySums.get(p.getExpenseType());
+                if (dateMap != null && p.getDailyLimit() > 0) {
+                    for (Map.Entry<LocalDate, Double> e : dateMap.entrySet()) {
+                        if (e.getValue() > p.getDailyLimit()) {
+                            output.getViolations().add(new Violation("POLICY_VIOLATION",
+                                p.getExpenseType() + " 同类型同日合计 " + e.getValue()
+                                    + " 超过日限额 " + p.getDailyLimit(), "WARN"));
                         }
                     }
                 }

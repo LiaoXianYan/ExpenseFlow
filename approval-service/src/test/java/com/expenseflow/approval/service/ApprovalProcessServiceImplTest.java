@@ -2,6 +2,7 @@ package com.expenseflow.approval.service;
 
 import com.expenseflow.approval.dto.ApprovalStartDTO;
 import com.expenseflow.approval.dto.ProcessStartResponse;
+import com.expenseflow.approval.dto.RuleInput;
 import com.expenseflow.approval.dto.RuleOutput;
 import com.expenseflow.approval.service.impl.ApprovalProcessServiceImpl;
 import org.flowable.engine.RuntimeService;
@@ -38,7 +39,7 @@ class ApprovalProcessServiceImplTest {
 
         RuleOutput rule = new RuleOutput();
         rule.setNeedDirector(false);
-        when(droolsRuleService.evaluate(anyString(), any())).thenReturn(rule);
+        when(droolsRuleService.evaluate(any(RuleInput.class))).thenReturn(rule);
         when(processInstance.getId()).thenReturn("pi-123");
         when(runtimeService.startProcessInstanceByKey(eq("travel-request-approval"), anyMap()))
             .thenReturn(processInstance);
@@ -59,7 +60,7 @@ class ApprovalProcessServiceImplTest {
         RuleOutput rule = new RuleOutput();
         rule.setNeedDirector(true);
         rule.getWarnings().add("高额警告");
-        when(droolsRuleService.evaluate(anyString(), any())).thenReturn(rule);
+        when(droolsRuleService.evaluate(any(RuleInput.class))).thenReturn(rule);
         when(processInstance.getId()).thenReturn("pi-456");
         when(runtimeService.startProcessInstanceByKey(eq("expense-report-approval"), anyMap()))
             .thenReturn(processInstance);
@@ -78,7 +79,7 @@ class ApprovalProcessServiceImplTest {
         dto.setAmount(BigDecimal.valueOf(1000));
 
         RuleOutput rule = new RuleOutput();
-        when(droolsRuleService.evaluate(anyString(), any())).thenReturn(rule);
+        when(droolsRuleService.evaluate(any(RuleInput.class))).thenReturn(rule);
 
         assertThrows(IllegalArgumentException.class, () -> processService.startProcess(dto));
     }
