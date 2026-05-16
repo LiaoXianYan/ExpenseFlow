@@ -10,7 +10,7 @@ import java.util.List;
 
 public class TestJwtHelper {
 
-    private static final String SECRET = "test-secret-key-min-256-bits-long-enough-for-hs256-algorithm";
+    private static final String SECRET = "ExpenseFlow2026SecretKeyForJWTTokenGenerationMustBeLongEnough!!";
     private static final SecretKey KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
     public static String generateToken(Long userId, Long tenantId, String... roles) {
