@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/system/tenant")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('SUPER_ADMIN')")
 public class TenantController {
 
     private final SysTenantMapper tenantMapper;
 
+    @PreAuthorize("hasAuthority('tenant:view')")
     @GetMapping("/page")
     public Result<Page<TenantVO>> page(@RequestParam(defaultValue = "1") int page,
                                         @RequestParam(defaultValue = "10") int size,
@@ -37,12 +37,14 @@ public class TenantController {
         return Result.ok(voPage);
     }
 
+    @PreAuthorize("hasAuthority('tenant:view')")
     @GetMapping("/{id}")
     public Result<TenantVO> getById(@PathVariable Long id) {
         SysTenant t = tenantMapper.selectById(id);
         return t == null ? Result.fail(404, "租户不存在") : Result.ok(toVO(t));
     }
 
+    @PreAuthorize("hasAuthority('tenant:create')")
     @PostMapping
     public Result<TenantVO> create(@Valid @RequestBody TenantDTO dto) {
         SysTenant t = new SysTenant();
@@ -52,6 +54,7 @@ public class TenantController {
         return Result.ok(toVO(t));
     }
 
+    @PreAuthorize("hasAuthority('tenant:edit')")
     @PutMapping("/{id}")
     public Result<TenantVO> update(@PathVariable Long id, @Valid @RequestBody TenantDTO dto) {
         SysTenant t = tenantMapper.selectById(id);

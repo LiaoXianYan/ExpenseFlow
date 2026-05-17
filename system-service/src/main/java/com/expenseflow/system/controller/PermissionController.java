@@ -7,6 +7,7 @@ import com.expenseflow.system.service.PermissionService;
 import com.expenseflow.system.vo.PermissionTreeVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class PermissionController {
     private final SysPermissionMapper permissionMapper;
     private final PermissionService permissionService;
 
+    @PreAuthorize("hasAuthority('role:assignPerm')")
     @GetMapping("/tree")
     public Result<List<PermissionTreeVO>> tree() {
         List<SysPermission> all = permissionMapper.selectList(

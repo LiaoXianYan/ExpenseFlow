@@ -22,19 +22,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/system/role")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('SUPER_ADMIN')")
 public class RoleController {
 
     private final SysRoleMapper roleMapper;
     private final SysUserRoleMapper userRoleMapper;
     private final SysRolePermissionMapper rolePermMapper;
 
+    @PreAuthorize("hasAuthority('role:view')")
     @GetMapping("/list")
     public Result<List<SysRole>> list() {
         return Result.ok(roleMapper.selectList(
             new LambdaQueryWrapper<SysRole>().orderByDesc(SysRole::getCreateTime)));
     }
 
+    @PreAuthorize("hasAuthority('role:create')")
     @PostMapping
     @AuditLog(module = "角色管理", operation = "CREATE")
     public Result<SysRole> create(@Valid @RequestBody RoleDTO dto) {
@@ -47,6 +48,7 @@ public class RoleController {
         return Result.ok(role);
     }
 
+    @PreAuthorize("hasAuthority('role:edit')")
     @PutMapping("/{id}")
     @AuditLog(module = "角色管理", operation = "UPDATE")
     public Result<SysRole> update(@PathVariable Long id, @Valid @RequestBody RoleDTO dto) {
@@ -84,6 +86,7 @@ public class RoleController {
         return Result.ok();
     }
 
+    @PreAuthorize("hasAuthority('role:assignPerm')")
     @PostMapping("/{id}/permissions")
     @AuditLog(module = "角色管理", operation = "ASSIGN_PERMISSIONS")
     @Transactional
