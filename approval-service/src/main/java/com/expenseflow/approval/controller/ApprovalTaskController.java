@@ -16,11 +16,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/approval/task")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('APPROVER','FINANCE','SUPER_ADMIN')")
 public class ApprovalTaskController extends BaseController {
 
     private final ApprovalTaskService taskService;
 
+    @PreAuthorize("hasAuthority('approval:view')")
     @GetMapping("/page")
     public Result<List<ApprovalTaskVO>> page(
             @RequestParam(required = false) String candidateGroup) {
@@ -34,6 +34,7 @@ public class ApprovalTaskController extends BaseController {
         return Result.ok(tasks);
     }
 
+    @PreAuthorize("hasAuthority('approval:approve')")
     @PostMapping("/{taskId}/complete")
     public Result<Void> complete(@PathVariable String taskId,
                                   @Valid @RequestBody TaskCompleteDTO dto) {
@@ -50,6 +51,7 @@ public class ApprovalTaskController extends BaseController {
         return Result.ok();
     }
 
+    @PreAuthorize("hasAuthority('approval:view')")
     @GetMapping("/record/list")
     public Result<List<ApprovalRecordVO>> records(@RequestParam String businessType,
                                                    @RequestParam Long businessId) {

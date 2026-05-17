@@ -6,6 +6,7 @@ import com.expenseflow.ai.vo.RagAnswerVO;
 import com.expenseflow.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +16,7 @@ public class RagController {
 
     private final RagService ragService;
 
+    @PreAuthorize("hasAuthority('ai:rag:query')")
     @PostMapping("/ask")
     public Result<RagAnswerVO> ask(@Valid @RequestBody RagQuestionDTO dto) {
         return Result.ok(ragService.ask(dto));

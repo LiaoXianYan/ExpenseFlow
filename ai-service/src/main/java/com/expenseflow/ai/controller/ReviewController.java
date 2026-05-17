@@ -9,6 +9,7 @@ import com.expenseflow.ai.vo.RiskReportVO;
 import com.expenseflow.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,11 +19,13 @@ public class ReviewController extends BaseController {
 
     private final DeepSeekReviewService reviewService;
 
+    @PreAuthorize("hasAuthority('ai:review:execute')")
     @PostMapping("/evaluate")
     public Result<ReviewResultVO> evaluate(@Valid @RequestBody ReviewRequestDTO dto) {
         return Result.ok(reviewService.review(dto, getCurrentTenantId()));
     }
 
+    @PreAuthorize("hasAuthority('ai:review:result')")
     @PostMapping("/risk")
     public Result<RiskReportVO> analyzeRisk(@Valid @RequestBody RiskAnalysisDTO dto) {
         return Result.ok(reviewService.analyzeRisk(dto.getReportId(), getCurrentTenantId()));

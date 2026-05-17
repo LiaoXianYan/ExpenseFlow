@@ -7,6 +7,7 @@ import com.expenseflow.ai.vo.OcrResultVO;
 import com.expenseflow.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,11 +17,13 @@ public class OcrController extends BaseController {
 
     private final OcrService ocrService;
 
+    @PreAuthorize("hasAuthority('ocr:recognize')")
     @PostMapping("/recognize")
     public Result<OcrResultVO> recognize(@Valid @RequestBody OcrRequestDTO dto) {
         return Result.ok(ocrService.recognize(dto, getCurrentTenantId()));
     }
 
+    @PreAuthorize("hasAuthority('ocr:result')")
     @GetMapping("/{id}")
     public Result<OcrResultVO> getResult(@PathVariable Long id) {
         return Result.ok(ocrService.getResult(id));
