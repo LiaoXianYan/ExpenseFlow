@@ -548,13 +548,19 @@ INSERT INTO sys_user (id, tenant_id, username, password, real_name, phone, statu
 VALUES (2, 0, 'manager', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '张经理', '13800000001', 1),
        (3, 0, 'director', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '李总监', '13800000002', 1),
        (4, 0, 'finance', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '王财务', '13800000003', 1),
-       (5, 0, 'cashier', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '赵出纳', '13800000004', 1);
+       (5, 0, 'cashier', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '赵出纳', '13800000004', 1),
+       (6, 0, 'tenant_admin', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '陈租户', '13800000005', 1),
+       (7, 0, 'employee', '$2b$10$dEJWjVMLopY.XeLwRHaDoeP1RiTwXhSgWsqvmXzU.TfgBoe4yh7iq', '刘员工', '13800000006', 1);
 
 INSERT INTO sys_user_role (user_id, role_id) VALUES
-(2, 4),  -- manager → APPROVER
-(3, 4),  -- director → APPROVER
+(2, 3),  -- manager → EMPLOYEE（自己也要报销）
+(2, 4),  -- manager → APPROVER（审批下属）
+(3, 3),  -- director → EMPLOYEE（自己也要报销）
+(3, 4),  -- director → APPROVER（审批下属）
 (4, 5),  -- finance → FINANCE
-(5, 6);  -- cashier → CASHIER
+(5, 6),  -- cashier → CASHIER
+(6, 2),  -- tenant_admin → TENANT_ADMIN
+(7, 3);  -- employee → EMPLOYEE
 
 -- ============================================================
 -- 7. 权限种子数据（57 条）
