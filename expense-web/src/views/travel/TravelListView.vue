@@ -5,7 +5,7 @@
         <h2><el-icon style="margin-right:6px"><Promotion /></el-icon>差旅出行</h2>
         <p class="subtitle">管理所有差旅出行记录</p>
       </div>
-      <el-button type="primary" size="large" @click="$router.push('/travel/create')">
+      <el-button v-permission="'travel:create'" type="primary" size="large" @click="$router.push('/travel/create')">
         <el-icon style="margin-right:4px"><Plus /></el-icon>新建出差
       </el-button>
     </div>
@@ -31,7 +31,7 @@
             <el-button size="small" @click="$router.push(`/travel/${row.id}/edit`)" v-if="row.status==='DRAFT'||row.status==='WITHDRAWN'">编辑</el-button>
             <el-button size="small" type="success" @click="handleSubmit(row)" v-if="row.status==='DRAFT'">提交</el-button>
             <el-button size="small" type="warning" @click="handleWithdraw(row)" v-if="row.status==='APPROVING'||row.status==='SUBMITTED'">撤回</el-button>
-            <el-button size="small" type="danger" v-permission="['FINANCE','SUPER_ADMIN']" @click="handleDelete(row)" v-if="row.status==='DRAFT'">删除</el-button>
+            <el-button size="small" type="danger" v-permission="'travel:delete'" @click="handleDelete(row)" v-if="row.status==='DRAFT'">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

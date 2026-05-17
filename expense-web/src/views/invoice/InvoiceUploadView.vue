@@ -27,7 +27,7 @@
         <el-table-column prop="ocrConfidence" label="置信度" width="90" />
         <el-table-column label="操作" width="120">
           <template #default="{ row }">
-            <el-button size="small" type="primary" @click="handleOcr(row)">OCR 识别</el-button>
+            <el-button v-permission="'ocr:recognize'" size="small" type="primary" @click="handleOcr(row)">OCR 识别</el-button>
           </template>
         </el-table-column>
       </el-table>

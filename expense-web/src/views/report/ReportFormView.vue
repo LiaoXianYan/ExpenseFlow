@@ -24,7 +24,7 @@
       <div style="margin-top:16px">
         <el-button type="primary" @click="handleSave" :loading="loading">保存</el-button>
         <el-button @click="$router.back()">返回</el-button>
-        <el-button type="success" @click="handleSubmit" :loading="loading" v-if="isEdit&&form.status==='DRAFT'">提交审批</el-button>
+        <el-button v-permission="'report:submit'" type="success" @click="handleSubmit" :loading="loading" v-if="isEdit&&form.status==='DRAFT'">提交审批</el-button>
         <el-button type="warning" @click="handlePay" :loading="loading" v-if="form.status==='APPROVED'">打款</el-button>
       </div>
     </el-card>

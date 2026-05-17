@@ -27,7 +27,7 @@
           </el-col>
         </el-row>
         <el-form-item>
-          <el-button type="primary" @click="handleSave" :loading="loading">保存</el-button>
+          <el-button v-permission="isEdit ? 'travel:edit' : 'travel:create'" type="primary" @click="handleSave" :loading="loading">保存</el-button>
           <el-button @click="$router.back()">返回</el-button>
           <el-button type="success" @click="handleSubmit" v-if="isEdit && form.status==='DRAFT'" :loading="loading">提交审批</el-button>
         </el-form-item>

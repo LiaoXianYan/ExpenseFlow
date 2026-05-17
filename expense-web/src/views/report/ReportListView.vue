@@ -5,7 +5,7 @@
         <h2><el-icon style="margin-right:6px"><Document /></el-icon>费用报销</h2>
         <p class="subtitle">管理所有费用报销</p>
       </div>
-      <el-button type="primary" size="large" @click="$router.push('/report/create')">
+      <el-button v-permission="'report:create'" type="primary" size="large" @click="$router.push('/report/create')">
         <el-icon style="margin-right:4px"><Plus /></el-icon>提交报销
       </el-button>
     </div>
@@ -33,7 +33,7 @@
             <el-button size="small" @click="$router.push(`/report/${row.id}/edit`)" v-if="row.status==='DRAFT'">编辑</el-button>
             <el-button size="small" type="success" @click="handleSubmit(row)" v-if="row.status==='DRAFT'">提交</el-button>
             <el-button size="small" type="primary" @click="handlePay(row)" v-if="row.status==='APPROVED'">打款</el-button>
-            <el-button size="small" type="danger" v-permission="['FINANCE','SUPER_ADMIN']" @click="handleDelete(row)" v-if="row.status==='DRAFT'">删除</el-button>
+            <el-button size="small" type="danger" v-permission="'report:delete'" @click="handleDelete(row)" v-if="row.status==='DRAFT'">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

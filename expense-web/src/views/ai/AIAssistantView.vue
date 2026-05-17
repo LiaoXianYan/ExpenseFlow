@@ -24,7 +24,7 @@
       </div>
       <div class="input-area">
         <el-input v-model="question" placeholder="输入差旅政策问题，如：住宿标准是多少？" size="large" @keyup.enter="handleAsk" />
-        <el-button type="primary" size="large" @click="handleAsk" :loading="loading">
+        <el-button v-permission="'ai:rag:query'" type="primary" size="large" @click="handleAsk" :loading="loading">
           <el-icon style="margin-right:4px"><Promotion /></el-icon>发送
         </el-button>
       </div>

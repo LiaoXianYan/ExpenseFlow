@@ -43,7 +43,7 @@
           <el-tag v-for="(item,i) in form.items" :key="i" closable @close="form.items.splice(i,1)" style="margin:4px" size="default">{{ item.expenseType }}: &yen;{{ item.amount }}元</el-tag>
         </div>
 
-        <el-button type="primary" size="large" @click="handleReview" :loading="loading" style="margin-top:20px;width:200px">
+        <el-button v-permission="'ai:review:execute'" type="primary" size="large" @click="handleReview" :loading="loading" style="margin-top:20px;width:200px">
           <el-icon style="margin-right:4px"><Cpu /></el-icon>开始 AI 审单
         </el-button>
       </el-form>
