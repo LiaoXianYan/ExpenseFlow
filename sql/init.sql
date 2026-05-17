@@ -556,6 +556,153 @@ INSERT INTO sys_user_role (user_id, role_id) VALUES
 (4, 5),  -- finance → FINANCE
 (5, 6);  -- cashier → CASHIER
 
+-- ============================================================
+-- 7. 权限种子数据（53 条）
+-- ============================================================
+-- 菜单权限（13 条，parent_id=0）
+INSERT INTO sys_permission (id, parent_id, permission_code, permission_name, permission_type, path, icon, sort_order) VALUES
+(101, 0, 'dashboard',        '工作台',       1, '/dashboard',       'DataAnalysis', 1),
+(102, 0, 'travel',           '差旅出行',     1, '/travel',          'Promotion',    2),
+(103, 0, 'report',           '费用报销',     1, '/report',          'Document',     3),
+(104, 0, 'invoice',          '票据管理',     1, '/invoice',         'Picture',      4),
+(105, 0, 'approval',         '审批中心',     1, '/approval',        'Checked',      5),
+(106, 0, 'ai:review',        '智能审单',     1, '/ai-review',       'Cpu',          6),
+(107, 0, 'ai:assistant',     '政策问答',     1, '/ai-assistant',    'ChatDotRound', 7),
+(108, 0, 'notification',     '消息中心',     1, '/notification',    'Bell',         8),
+(109, 0, 'system:user',      '用户管理',     1, '/system/user',     'User',         9),
+(110, 0, 'system:role',      '角色管理',     1, '/system/role',     'Avatar',       10),
+(111, 0, 'system:tenant',    '租户管理',     1, '/system/tenant',   'OfficeBuilding',11),
+(112, 0, 'finance:payment',  '打款管理',     1, '/payment',         'Money',        12),
+(113, 0, 'finance:policy',   '费用政策',     1, '/finance/policy',  'Tickets',      13);
+
+-- 操作权限（40 条，parent_id 指向对应菜单）
+INSERT INTO sys_permission (id, parent_id, permission_code, permission_name, permission_type, path, icon, sort_order) VALUES
+-- dashboard
+(201, 101, 'dashboard:view',     '查看工作台',     2, NULL, NULL, 1),
+-- travel
+(202, 102, 'travel:create',      '新建出差',       2, NULL, NULL, 1),
+(203, 102, 'travel:view',        '查看出差列表',   2, NULL, NULL, 2),
+(204, 102, 'travel:edit',        '编辑出差',       2, NULL, NULL, 3),
+(205, 102, 'travel:delete',      '删除出差',       2, NULL, NULL, 4),
+-- report
+(206, 103, 'report:create',      '创建报销单',     2, NULL, NULL, 1),
+(207, 103, 'report:view',        '查看报销列表',   2, NULL, NULL, 2),
+(208, 103, 'report:edit',        '编辑报销单',     2, NULL, NULL, 3),
+(209, 103, 'report:delete',      '删除报销单',     2, NULL, NULL, 4),
+(210, 103, 'report:submit',      '提交报销单',     2, NULL, NULL, 5),
+(211, 103, 'report:withdraw',    '撤回报销单',     2, NULL, NULL, 6),
+-- invoice
+(212, 104, 'invoice:upload',     '上传发票',       2, NULL, NULL, 1),
+(213, 104, 'invoice:view',       '查看发票列表',   2, NULL, NULL, 2),
+(214, 104, 'invoice:delete',     '删除发票',       2, NULL, NULL, 3),
+-- ocr
+(215, 104, 'ocr:recognize',      '触发OCR识别',    2, NULL, NULL, 4),
+(216, 104, 'ocr:result',         '查看OCR结果',    2, NULL, NULL, 5),
+-- approval
+(217, 105, 'approval:view',      '查看待办列表',   2, NULL, NULL, 1),
+(218, 105, 'approval:approve',   '审批通过',       2, NULL, NULL, 2),
+(219, 105, 'approval:reject',    '审批驳回',       2, NULL, NULL, 3),
+(220, 105, 'approval:delegate',  '委派审批',       2, NULL, NULL, 4),
+-- payment
+(221, 112, 'payment:create',     '发起打款',       2, NULL, NULL, 1),
+(222, 112, 'payment:confirm',    '确认打款',       2, NULL, NULL, 2),
+(223, 112, 'payment:view',       '查看打款记录',   2, NULL, NULL, 3),
+-- policy
+(224, 113, 'policy:create',      '创建费用政策',   2, NULL, NULL, 1),
+(225, 113, 'policy:edit',        '编辑费用政策',   2, NULL, NULL, 2),
+(226, 113, 'policy:delete',      '删除费用政策',   2, NULL, NULL, 3),
+(227, 113, 'policy:view',        '查看费用政策',   2, NULL, NULL, 4),
+-- user
+(228, 109, 'user:create',        '创建用户',       2, NULL, NULL, 1),
+(229, 109, 'user:edit',          '编辑用户',       2, NULL, NULL, 2),
+(230, 109, 'user:delete',        '删除用户',       2, NULL, NULL, 3),
+(231, 109, 'user:view',          '查看用户列表',   2, NULL, NULL, 4),
+(232, 109, 'user:assignRole',    '分配角色',       2, NULL, NULL, 5),
+-- role
+(233, 110, 'role:create',        '创建角色',       2, NULL, NULL, 1),
+(234, 110, 'role:edit',          '编辑角色',       2, NULL, NULL, 2),
+(235, 110, 'role:view',          '查看角色列表',   2, NULL, NULL, 3),
+(236, 110, 'role:assignPerm',    '分配权限',       2, NULL, NULL, 4),
+-- tenant
+(237, 111, 'tenant:create',      '创建租户',       2, NULL, NULL, 1),
+(238, 111, 'tenant:edit',        '编辑租户',       2, NULL, NULL, 2),
+(239, 111, 'tenant:view',        '查看租户列表',   2, NULL, NULL, 3),
+-- notification
+(240, 108, 'notification:manage','管理通知模板',   2, NULL, NULL, 1),
+(241, 108, 'notification:send',  '手动发送通知',   2, NULL, NULL, 2),
+-- ai
+(242, 106, 'ai:review:execute',  '执行AI审单',     2, NULL, NULL, 1),
+(243, 106, 'ai:review:result',   '查看AI审单结果', 2, NULL, NULL, 2),
+(244, 107, 'ai:rag:query',       'RAG政策问答',    2, NULL, NULL, 1);
+
+-- ============================================================
+-- 8. 角色-权限关联种子数据
+-- ============================================================
+-- SUPER_ADMIN (role_id=1): 拥有全部 53 个权限
+INSERT INTO sys_role_permission (role_id, permission_id) VALUES
+(1,101),(1,102),(1,103),(1,104),(1,105),(1,106),(1,107),(1,108),(1,109),(1,110),(1,111),(1,112),(1,113),
+(1,201),(1,202),(1,203),(1,204),(1,205),
+(1,206),(1,207),(1,208),(1,209),(1,210),(1,211),
+(1,212),(1,213),(1,214),(1,215),(1,216),
+(1,217),(1,218),(1,219),(1,220),
+(1,221),(1,222),(1,223),
+(1,224),(1,225),(1,226),(1,227),
+(1,228),(1,229),(1,230),(1,231),(1,232),
+(1,233),(1,234),(1,235),(1,236),
+(1,237),(1,238),(1,239),
+(1,240),(1,241),
+(1,242),(1,243),(1,244);
+
+-- TENANT_ADMIN (role_id=2): 不含 system:tenant 菜单和 tenant:create/edit
+INSERT INTO sys_role_permission (role_id, permission_id) VALUES
+(2,101),(2,102),(2,103),(2,104),(2,105),(2,106),(2,107),(2,108),(2,109),(2,110),(2,112),(2,113),
+(2,201),(2,202),(2,203),(2,204),(2,205),
+(2,206),(2,207),(2,208),(2,209),(2,210),(2,211),
+(2,212),(2,213),(2,214),(2,215),(2,216),
+(2,217),(2,218),(2,219),(2,220),
+(2,223),
+(2,224),(2,225),(2,226),(2,227),
+(2,228),(2,229),(2,230),(2,231),(2,232),
+(2,233),(2,234),(2,235),(2,236),
+(2,239),
+(2,240),(2,241),
+(2,242),(2,243),(2,244);
+
+-- EMPLOYEE (role_id=3): 只能做自己的差旅/报销/发票/OCR
+INSERT INTO sys_role_permission (role_id, permission_id) VALUES
+(3,101),(3,102),(3,103),(3,104),(3,107),(3,108),
+(3,201),(3,202),(3,203),(3,204),(3,205),
+(3,206),(3,207),(3,208),(3,209),(3,210),(3,211),
+(3,212),(3,213),(3,214),(3,215),(3,216),
+(3,227),
+(3,244);
+
+-- APPROVER (role_id=4): 审批操作 + 可查看差旅/报销/政策 + AI问答/结果
+INSERT INTO sys_role_permission (role_id, permission_id) VALUES
+(4,101),(4,105),(4,107),(4,108),
+(4,201),(4,203),
+(4,207),
+(4,217),(4,218),(4,219),(4,220),
+(4,227),
+(4,243),(4,244);
+
+-- FINANCE (role_id=5): 财务审核员 — 审批+发票查看+OCR+费用政策+AI审单
+INSERT INTO sys_role_permission (role_id, permission_id) VALUES
+(5,101),(5,105),(5,106),(5,107),(5,108),(5,113),
+(5,201),(5,203),
+(5,207),
+(5,213),(5,215),(5,216),
+(5,217),(5,218),(5,219),
+(5,223),(5,224),(5,225),(5,226),(5,227),
+(5,242),(5,243),(5,244);
+
+-- CASHIER (role_id=6): 只管打款 + 收消息 + 看报销单
+INSERT INTO sys_role_permission (role_id, permission_id) VALUES
+(6,101),(6,108),(6,112),
+(6,201),
+(6,207),
+(6,221),(6,222),(6,223);
+
 -- 费用政策（演示用）
 INSERT INTO ex_expense_policy (tenant_id, policy_name, expense_type, max_amount, daily_limit, city_tier, effective_date, expire_date, status, create_time) VALUES
 (0, '交通费标准', 'TRANSPORT', 5000.00, NULL, 'TIER1', '2026-01-01', '2027-12-31', 1, NOW()),
