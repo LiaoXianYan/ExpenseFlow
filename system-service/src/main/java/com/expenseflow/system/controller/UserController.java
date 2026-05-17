@@ -53,12 +53,14 @@ public class UserController {
         return userService.delete(id);
     }
 
+    @PreAuthorize("hasAuthority('user:edit')")
     @PatchMapping("/{id}/status")
     @AuditLog(module = "用户管理", operation = "UPDATE_STATUS")
     public Result<Void> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
         return userService.updateStatus(id, status);
     }
 
+    @PreAuthorize("hasAuthority('user:edit')")
     @PatchMapping("/{id}/password")
     @AuditLog(module = "用户管理", operation = "RESET_PASSWORD")
     public Result<Void> resetPassword(@PathVariable Long id, @RequestParam String password) {

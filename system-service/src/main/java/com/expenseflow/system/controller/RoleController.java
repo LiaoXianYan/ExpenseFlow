@@ -60,6 +60,7 @@ public class RoleController {
         return Result.ok(role);
     }
 
+    @PreAuthorize("hasAuthority('role:edit')")
     @DeleteMapping("/{id}")
     @AuditLog(module = "角色管理", operation = "DELETE")
     @Transactional
@@ -70,6 +71,7 @@ public class RoleController {
         return Result.ok();
     }
 
+    @PreAuthorize("hasAuthority('user:assignRole')")
     @PostMapping("/{id}/users")
     @AuditLog(module = "角色管理", operation = "ASSIGN_USERS")
     @Transactional

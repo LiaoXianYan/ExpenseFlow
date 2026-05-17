@@ -65,12 +65,14 @@ public class TenantController {
         return Result.ok(toVO(t));
     }
 
+    @PreAuthorize("hasAuthority('tenant:edit')")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         tenantMapper.deleteById(id);
         return Result.ok();
     }
 
+    @PreAuthorize("hasAuthority('tenant:edit')")
     @PatchMapping("/{id}/status")
     public Result<Void> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
         SysTenant t = tenantMapper.selectById(id);
