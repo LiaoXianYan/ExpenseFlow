@@ -68,9 +68,10 @@ public class SecurityConfig {
                 Long userId = JwtUtil.getUserId(claims);
                 Long tenantId = JwtUtil.getTenantId(claims);
                 List<String> roles = JwtUtil.getRoles(claims);
-                List<SimpleGrantedAuthority> authorities = roles.stream()
-                    .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
-                    .toList();
+                List<String> permissions = JwtUtil.getPermissions(claims);
+                List<SimpleGrantedAuthority> authorities = new java.util.ArrayList<>();
+                roles.forEach(r -> authorities.add(new SimpleGrantedAuthority("ROLE_" + r)));
+                permissions.forEach(p -> authorities.add(new SimpleGrantedAuthority(p)));
                 UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userId, null, authorities);
                 auth.setDetails(tenantId);
