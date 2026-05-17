@@ -6,7 +6,7 @@ import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
-import { hasPermission } from './utils/permission'
+import { vPermission } from './directives/permission'
 
 const app = createApp(App)
 app.use(createPinia())
@@ -17,12 +17,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
-app.directive('permission', {
-  mounted(el, binding) {
-    if (!hasPermission(binding.value)) {
-      el.parentNode?.removeChild(el)
-    }
-  }
-})
+app.directive('permission', vPermission)
 
 app.mount('#app')
