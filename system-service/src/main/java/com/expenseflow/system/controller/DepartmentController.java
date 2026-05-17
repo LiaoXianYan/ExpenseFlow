@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -22,6 +23,7 @@ public class DepartmentController {
 
     private final SysDepartmentMapper deptMapper;
 
+    @PreAuthorize("hasAuthority('user:view')")
     @GetMapping("/tree")
     public Result<List<DeptTreeVO>> tree() {
         List<SysDepartment> all = deptMapper.selectList(
@@ -31,6 +33,7 @@ public class DepartmentController {
         return Result.ok(buildTree(0L, parentMap));
     }
 
+    @PreAuthorize("hasAuthority('user:edit')")
     @PostMapping
     @AuditLog(module = "部门管理", operation = "CREATE")
     public Result<DeptTreeVO> create(@Valid @RequestBody DepartmentDTO dto) {
@@ -42,6 +45,7 @@ public class DepartmentController {
         return Result.ok(vo);
     }
 
+    @PreAuthorize("hasAuthority('user:edit')")
     @PutMapping("/{id}")
     @AuditLog(module = "部门管理", operation = "UPDATE")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody DepartmentDTO dto) {
@@ -53,6 +57,7 @@ public class DepartmentController {
         return Result.ok();
     }
 
+    @PreAuthorize("hasAuthority('user:edit')")
     @DeleteMapping("/{id}")
     @AuditLog(module = "部门管理", operation = "DELETE")
     public Result<Void> delete(@PathVariable Long id) {

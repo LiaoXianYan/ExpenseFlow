@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +20,7 @@ public class EmployeeController {
 
     private final SysEmployeeMapper employeeMapper;
 
+    @PreAuthorize("hasAuthority('user:view')")
     @GetMapping("/page")
     public Result<Page<SysEmployee>> page(@RequestParam(defaultValue = "1") int page,
                                            @RequestParam(defaultValue = "10") int size,
@@ -29,6 +31,7 @@ public class EmployeeController {
         return Result.ok(employeeMapper.selectPage(new Page<>(page, size), qw));
     }
 
+    @PreAuthorize("hasAuthority('user:create')")
     @PostMapping
     @AuditLog(module = "员工管理", operation = "CREATE")
     public Result<SysEmployee> create(@Valid @RequestBody EmployeeDTO dto) {
@@ -38,6 +41,7 @@ public class EmployeeController {
         return Result.ok(emp);
     }
 
+    @PreAuthorize("hasAuthority('user:edit')")
     @PutMapping("/{id}")
     @AuditLog(module = "员工管理", operation = "UPDATE")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody EmployeeDTO dto) {
@@ -49,6 +53,7 @@ public class EmployeeController {
         return Result.ok();
     }
 
+    @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{id}")
     @AuditLog(module = "员工管理", operation = "DELETE")
     public Result<Void> delete(@PathVariable Long id) {

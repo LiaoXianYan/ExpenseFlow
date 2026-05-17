@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,12 +25,14 @@ public class DictController {
     private final SysDictTypeMapper dictTypeMapper;
     private final SysDictDataMapper dictDataMapper;
 
+    @PreAuthorize("hasAuthority('role:view')")
     @GetMapping("/type/list")
     public Result<List<SysDictType>> typeList() {
         return Result.ok(dictTypeMapper.selectList(
             new LambdaQueryWrapper<SysDictType>().orderByDesc(SysDictType::getCreateTime)));
     }
 
+    @PreAuthorize("hasAuthority('role:edit')")
     @PostMapping("/type")
     @AuditLog(module = "字典管理", operation = "CREATE_TYPE")
     public Result<SysDictType> createType(@Valid @RequestBody DictTypeDTO dto) {
@@ -40,6 +43,7 @@ public class DictController {
         return Result.ok(t);
     }
 
+    @PreAuthorize("hasAuthority('role:view')")
     @GetMapping("/data/list")
     public Result<List<SysDictData>> dataList(@RequestParam Long typeId) {
         return Result.ok(dictDataMapper.selectList(
@@ -47,6 +51,7 @@ public class DictController {
                 .orderByAsc(SysDictData::getSortOrder)));
     }
 
+    @PreAuthorize("hasAuthority('role:edit')")
     @PostMapping("/data")
     @AuditLog(module = "字典管理", operation = "CREATE_DATA")
     public Result<SysDictData> createData(@Valid @RequestBody DictDataDTO dto) {
@@ -57,6 +62,7 @@ public class DictController {
         return Result.ok(d);
     }
 
+    @PreAuthorize("hasAuthority('role:edit')")
     @PutMapping("/data/{id}")
     @AuditLog(module = "字典管理", operation = "UPDATE_DATA")
     public Result<Void> updateData(@PathVariable Long id, @Valid @RequestBody DictDataDTO dto) {
@@ -68,6 +74,7 @@ public class DictController {
         return Result.ok();
     }
 
+    @PreAuthorize("hasAuthority('role:edit')")
     @DeleteMapping("/data/{id}")
     @AuditLog(module = "字典管理", operation = "DELETE_DATA")
     public Result<Void> deleteData(@PathVariable Long id) {

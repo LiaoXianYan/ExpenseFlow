@@ -6,11 +6,13 @@ import com.expenseflow.notification.service.MessageService;
 import com.expenseflow.notification.vo.MessageVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/notification/message")
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
 public class MessageController extends BaseController {
 
     private final MessageService messageService;

@@ -7,6 +7,7 @@ import com.expenseflow.approval.service.ApprovalProcessService;
 import com.expenseflow.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +17,7 @@ public class ApprovalProcessController extends BaseController {
 
     private final ApprovalProcessService processService;
 
+    @PreAuthorize("hasAuthority('report:submit')")
     @PostMapping("/start")
     public Result<ProcessStartResponse> startProcess(@Valid @RequestBody ApprovalStartDTO dto) {
         ProcessStartResponse response = processService.startProcess(dto);
