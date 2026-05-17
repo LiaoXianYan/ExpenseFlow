@@ -575,7 +575,7 @@ INSERT INTO sys_permission (id, parent_id, permission_code, permission_name, per
 (112, 0, 'finance:payment',  '打款管理',     1, '/payment',         'Money',        12),
 (113, 0, 'finance:policy',   '费用政策',     1, '/finance/policy',  'Tickets',      13);
 
--- 操作权限（40 条，parent_id 指向对应菜单）
+-- 操作权限（44 条，parent_id 指向对应菜单）
 INSERT INTO sys_permission (id, parent_id, permission_code, permission_name, permission_type, path, icon, sort_order) VALUES
 -- dashboard
 (201, 101, 'dashboard:view',     '查看工作台',     2, NULL, NULL, 1),
@@ -595,7 +595,7 @@ INSERT INTO sys_permission (id, parent_id, permission_code, permission_name, per
 (212, 104, 'invoice:upload',     '上传发票',       2, NULL, NULL, 1),
 (213, 104, 'invoice:view',       '查看发票列表',   2, NULL, NULL, 2),
 (214, 104, 'invoice:delete',     '删除发票',       2, NULL, NULL, 3),
--- ocr
+-- OCR
 (215, 104, 'ocr:recognize',      '触发OCR识别',    2, NULL, NULL, 4),
 (216, 104, 'ocr:result',         '查看OCR结果',    2, NULL, NULL, 5),
 -- approval
@@ -638,7 +638,7 @@ INSERT INTO sys_permission (id, parent_id, permission_code, permission_name, per
 -- ============================================================
 -- 8. 角色-权限关联种子数据
 -- ============================================================
--- SUPER_ADMIN (role_id=1): 拥有全部 53 个权限
+-- SUPER_ADMIN (role_id=1): 拥有全部 57 个权限
 INSERT INTO sys_role_permission (role_id, permission_id) VALUES
 (1,101),(1,102),(1,103),(1,104),(1,105),(1,106),(1,107),(1,108),(1,109),(1,110),(1,111),(1,112),(1,113),
 (1,201),(1,202),(1,203),(1,204),(1,205),
