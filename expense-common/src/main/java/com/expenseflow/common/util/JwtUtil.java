@@ -25,9 +25,19 @@ public class JwtUtil {
         return generateToken(userId, tenantId, tokenId, roles, permissions, username, ACCESS_EXPIRE);
     }
 
+    public static String generateAccessToken(Long userId, Long tenantId, String tokenId,
+                                              List<String> roles, String username) {
+        return generateToken(userId, tenantId, tokenId, roles, Collections.emptyList(), username, ACCESS_EXPIRE);
+    }
+
     public static String generateRefreshToken(Long userId, Long tenantId, String tokenId,
                                                List<String> roles, List<String> permissions, String username) {
         return generateToken(userId, tenantId, tokenId, roles, permissions, username, REFRESH_EXPIRE);
+    }
+
+    public static String generateRefreshToken(Long userId, Long tenantId, String tokenId,
+                                               List<String> roles, String username) {
+        return generateToken(userId, tenantId, tokenId, roles, Collections.emptyList(), username, REFRESH_EXPIRE);
     }
 
     private static String generateToken(Long userId, Long tenantId, String tokenId,
