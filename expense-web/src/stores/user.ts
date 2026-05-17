@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { usePermissionStore } from './permission'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref(localStorage.getItem('token') || '')
@@ -17,11 +18,21 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = info
   }
 
+  async function login(t: string, info: any) {
+    setToken(t)
+    setUserInfo(info)
+    // 拉取权限码
+    const permStore = usePermissionStore()
+    await permStore.fetchPermissions()
+  }
+
   function logout() {
+    const permStore = usePermissionStore()
+    permStore.reset()
     token.value = ''
     userInfo.value = null
     localStorage.removeItem('token')
   }
 
-  return { token, userInfo, isLoggedIn, setToken, setUserInfo, logout }
+  return { token, userInfo, isLoggedIn, setToken, setUserInfo, login, logout }
 })

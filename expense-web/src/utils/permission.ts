@@ -1,29 +1,19 @@
 import { getUserRoles } from './jwt'
-
-// 角色→权限码映射（与后端 @PreAuthorize 一致）
-const ROLE_PERMISSIONS: Record<string, string[]> = {
-  SUPER_ADMIN: ['*'],
-  FINANCE: ['approval:approve', 'approval:reject', 'expense:report:delete', 'expense:payment:create'],
-  APPROVER: ['approval:approve', 'approval:reject'],
-  CASHIER: ['expense:payment:create'],
-  USER: [],
-}
+import { usePermissionStore } from '@/stores/permission'
 
 /**
- * 检查当前用户是否拥有指定角色或权限
- * 含 ':' 视为权限码，否则视为角色名
+ * Check if the current user has the specified permission code or role.
+ * Codes with ':' are treated as permission codes, otherwise as role names.
  */
 export function hasPermission(required: string | string[]): boolean {
-  const roles = getUserRoles()
+  const permStore = usePermissionStore()
   const list = Array.isArray(required) ? required : [required]
   return list.some(p => {
     if (p.includes(':')) {
-      // 权限码 → 查映射表
-      return roles.some(r =>
-        ROLE_PERMISSIONS[r]?.includes(p) || ROLE_PERMISSIONS[r]?.includes('*')
-      )
+      return permStore.has(p)
     }
-    // 角色名 → 直接比较
+    // Fallback: treat as role name
+    const roles = getUserRoles()
     return roles.includes(p)
   })
 }
