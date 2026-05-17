@@ -3,9 +3,12 @@ package com.expenseflow.system.controller;
 import com.expenseflow.common.result.Result;
 import com.expenseflow.system.entity.SysPermission;
 import com.expenseflow.system.mapper.SysPermissionMapper;
+import com.expenseflow.system.service.PermissionService;
 import com.expenseflow.system.vo.PermissionTreeVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 public class PermissionController {
 
     private final SysPermissionMapper permissionMapper;
+    private final PermissionService permissionService;
 
     @GetMapping("/tree")
     public Result<List<PermissionTreeVO>> tree() {
@@ -25,6 +29,13 @@ public class PermissionController {
         Map<Long, List<SysPermission>> parentMap = all.stream()
             .collect(Collectors.groupingBy(p -> p.getParentId() == null ? 0L : p.getParentId()));
         return Result.ok(buildTree(0L, parentMap));
+    }
+
+    @GetMapping("/my")
+    public Result<List<String>> myPermissions() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getPrincipal();
+        return Result.ok(permissionService.getPermissionCodesByUserId(userId));
     }
 
     private List<PermissionTreeVO> buildTree(Long parentId, Map<Long, List<SysPermission>> map) {

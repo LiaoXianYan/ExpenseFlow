@@ -8,6 +8,7 @@ import com.expenseflow.system.entity.SysUserRole;
 import com.expenseflow.system.mapper.SysOauthUserMapper;
 import com.expenseflow.system.mapper.SysUserMapper;
 import com.expenseflow.system.mapper.SysUserRoleMapper;
+import com.expenseflow.system.service.PermissionService;
 
 import java.util.List;
 import com.expenseflow.system.vo.TokenVO;
@@ -30,6 +31,7 @@ public class OAuthController {
     private final SysOauthUserMapper oauthUserMapper;
     private final SysUserRoleMapper userRoleMapper;
     private final PasswordEncoder passwordEncoder;
+    private final PermissionService permissionService;
 
     @PostMapping("/dingtalk/login")
     public Result<TokenVO> dingtalkLogin(@RequestBody(required = false) Map<String, String> body) {
@@ -76,9 +78,11 @@ public class OAuthController {
             userRoleMapper.insert(ur);
         }
 
+        List<String> permissions = permissionService.getPermissionCodesByUserId(user.getId());
+
         String tokenId = UUID.randomUUID().toString().replace("-", "");
-        String accessToken = JwtUtil.generateAccessToken(user.getId(), user.getTenantId(), tokenId, List.of("EMPLOYEE"), user.getUsername());
-        String refreshToken = JwtUtil.generateRefreshToken(user.getId(), user.getTenantId(), tokenId, List.of("EMPLOYEE"), user.getUsername());
+        String accessToken = JwtUtil.generateAccessToken(user.getId(), user.getTenantId(), tokenId, List.of("EMPLOYEE"), permissions, user.getUsername());
+        String refreshToken = JwtUtil.generateRefreshToken(user.getId(), user.getTenantId(), tokenId, List.of("EMPLOYEE"), permissions, user.getUsername());
 
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);

@@ -10,6 +10,7 @@ import com.expenseflow.system.mapper.SysUserMapper;
 import com.expenseflow.system.mapper.SysUserRoleMapper;
 import com.expenseflow.system.mapper.SysRoleMapper;
 import com.expenseflow.system.service.AuthService;
+import com.expenseflow.system.service.PermissionService;
 import com.expenseflow.system.vo.TokenVO;
 import com.expenseflow.system.vo.UserVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -33,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final SysRoleMapper roleMapper;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final PermissionService permissionService;
 
     @Override
     public Result<TokenVO> login(LoginDTO dto) {
@@ -56,9 +58,11 @@ public class AuthServiceImpl implements AuthService {
             redisTemplate.opsForValue().set("user:perm:" + user.getId(), new HashSet<>(roleCodes), 30, TimeUnit.MINUTES);
         }
 
+        List<String> permissions = permissionService.getPermissionCodesByUserId(user.getId());
+
         String tokenId = UUID.randomUUID().toString().replace("-", "");
-        String accessToken = JwtUtil.generateAccessToken(user.getId(), user.getTenantId(), tokenId, roleCodes, user.getUsername());
-        String refreshToken = JwtUtil.generateRefreshToken(user.getId(), user.getTenantId(), tokenId, roleCodes, user.getUsername());
+        String accessToken = JwtUtil.generateAccessToken(user.getId(), user.getTenantId(), tokenId, roleCodes, permissions, user.getUsername());
+        String refreshToken = JwtUtil.generateRefreshToken(user.getId(), user.getTenantId(), tokenId, roleCodes, permissions, user.getUsername());
 
         UserVO userVO = toUserVO(user);
         // Cache user info
@@ -107,9 +111,11 @@ public class AuthServiceImpl implements AuthService {
             roleCodes = JwtUtil.getRoles(claims); // fallback to JWT claims
         }
 
+        List<String> permissions = permissionService.getPermissionCodesByUserId(userId);
+
         String newTokenId = UUID.randomUUID().toString().replace("-", "");
-        String newAccessToken = JwtUtil.generateAccessToken(userId, tenantId, newTokenId, roleCodes, user.getUsername());
-        String newRefreshToken = JwtUtil.generateRefreshToken(userId, tenantId, newTokenId, roleCodes, user.getUsername());
+        String newAccessToken = JwtUtil.generateAccessToken(userId, tenantId, newTokenId, roleCodes, permissions, user.getUsername());
+        String newRefreshToken = JwtUtil.generateRefreshToken(userId, tenantId, newTokenId, roleCodes, permissions, user.getUsername());
 
         redisTemplate.opsForValue().set("token:" + newTokenId, "1", 2, TimeUnit.HOURS);
         return Result.ok(new TokenVO(newAccessToken, newRefreshToken, 7200, toUserVO(user)));
