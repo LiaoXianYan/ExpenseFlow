@@ -16,33 +16,33 @@
           <el-icon><DataAnalysis /></el-icon><span>工作台</span>
         </el-menu-item>
 
-        <el-sub-menu index="travel">
+        <el-sub-menu index="travel" v-if="perm.has('travel')">
           <template #title><el-icon><Promotion /></el-icon><span>差旅出行</span></template>
-          <el-menu-item index="/travel">我的行程</el-menu-item>
-          <el-menu-item index="/travel/create">新建出差</el-menu-item>
+          <el-menu-item index="/travel" v-if="perm.has('travel:view')">我的行程</el-menu-item>
+          <el-menu-item index="/travel/create" v-if="perm.has('travel:create')">新建出差</el-menu-item>
         </el-sub-menu>
 
-        <el-sub-menu index="report">
+        <el-sub-menu index="report" v-if="perm.has('report')">
           <template #title><el-icon><Document /></el-icon><span>费用报销</span></template>
-          <el-menu-item index="/report">我的报销</el-menu-item>
-          <el-menu-item index="/report/create">提交报销</el-menu-item>
+          <el-menu-item index="/report" v-if="perm.has('report:view')">我的报销</el-menu-item>
+          <el-menu-item index="/report/create" v-if="perm.has('report:create')">提交报销</el-menu-item>
         </el-sub-menu>
 
-        <el-menu-item index="/invoice">
+        <el-menu-item index="/invoice" v-if="perm.has('invoice')">
           <el-icon><Picture /></el-icon><span>票据管理</span>
         </el-menu-item>
 
-        <el-menu-item index="/approval">
+        <el-menu-item index="/approval" v-if="perm.has('approval')">
           <el-icon><Checked /></el-icon><span>审批中心</span>
         </el-menu-item>
 
-        <el-sub-menu index="ai">
+        <el-sub-menu index="ai" v-if="perm.has('ai:review') || perm.has('ai:assistant')">
           <template #title><el-icon><Cpu /></el-icon><span>智能服务</span></template>
-          <el-menu-item index="/ai-review">智能审单</el-menu-item>
-          <el-menu-item index="/ai-assistant">政策问答</el-menu-item>
+          <el-menu-item index="/ai-review" v-if="perm.has('ai:review')">智能审单</el-menu-item>
+          <el-menu-item index="/ai-assistant" v-if="perm.has('ai:assistant')">政策问答</el-menu-item>
         </el-sub-menu>
 
-        <el-menu-item index="/notification">
+        <el-menu-item index="/notification" v-if="perm.has('notification')">
           <el-icon><Bell /></el-icon><span>消息中心</span>
         </el-menu-item>
       </el-menu>
@@ -79,11 +79,13 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
+import { usePermissionStore } from '@/stores/permission'
 import { SwitchButton } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const perm = usePermissionStore()
 
 function handleLogout() {
   userStore.logout()

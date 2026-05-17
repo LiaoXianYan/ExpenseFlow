@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import { hasAnyRole } from '../utils/jwt'
+import { usePermissionStore } from '@/stores/permission'
 import { ElMessage } from 'element-plus'
 
 const routes: RouteRecordRaw[] = [
@@ -20,17 +20,17 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'approval', name: 'ApprovalWorkbench',
         component: () => import('../views/approval/ApprovalWorkbench.vue'),
-        meta: { roles: ['APPROVER', 'FINANCE', 'SUPER_ADMIN'] }
+        meta: { permission: 'approval' }
       },
       {
         path: 'ai-review', name: 'AIReview',
         component: () => import('../views/ai/AIReviewView.vue'),
-        meta: { roles: ['FINANCE', 'APPROVER', 'SUPER_ADMIN'] }
+        meta: { permission: 'ai:review' }
       },
       {
         path: 'ai-assistant', name: 'AIAssistant',
         component: () => import('../views/ai/AIAssistantView.vue'),
-        meta: { roles: ['FINANCE', 'APPROVER', 'SUPER_ADMIN'] }
+        meta: { permission: 'ai:assistant' }
       },
       { path: 'notification', name: 'NotificationCenter', component: () => import('../views/notification/NotificationCenter.vue') }
     ]
@@ -52,8 +52,9 @@ router.beforeEach((to, from, next) => {
     next('/dashboard')
     return
   }
-  if (to.meta.roles && Array.isArray(to.meta.roles) && to.meta.roles.length > 0) {
-    if (!hasAnyRole(to.meta.roles as string[])) {
+  if (to.meta.permission) {
+    const permStore = usePermissionStore()
+    if (!permStore.has(to.meta.permission as string)) {
       ElMessage.warning('您没有访问此页面的权限')
       next('/dashboard')
       return
