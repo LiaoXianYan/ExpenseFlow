@@ -557,7 +557,7 @@ INSERT INTO sys_user_role (user_id, role_id) VALUES
 (5, 6);  -- cashier → CASHIER
 
 -- ============================================================
--- 7. 权限种子数据（53 条）
+-- 7. 权限种子数据（57 条）
 -- ============================================================
 -- 菜单权限（13 条，parent_id=0）
 INSERT INTO sys_permission (id, parent_id, permission_code, permission_name, permission_type, path, icon, sort_order) VALUES
