@@ -43,6 +43,7 @@ public class ApprovalTaskController extends BaseController {
         return Result.ok();
     }
 
+    @PreAuthorize("hasAuthority('approval:delegate')")
     @PostMapping("/{taskId}/delegate")
     public Result<Void> delegate(@PathVariable String taskId,
                                   @RequestParam String delegateToUser) {
