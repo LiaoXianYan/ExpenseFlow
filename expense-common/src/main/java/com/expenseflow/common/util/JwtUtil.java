@@ -20,21 +20,25 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String generateAccessToken(Long userId, Long tenantId, String tokenId, List<String> roles, String username) {
-        return generateToken(userId, tenantId, tokenId, roles, username, ACCESS_EXPIRE);
+    public static String generateAccessToken(Long userId, Long tenantId, String tokenId,
+                                              List<String> roles, List<String> permissions, String username) {
+        return generateToken(userId, tenantId, tokenId, roles, permissions, username, ACCESS_EXPIRE);
     }
 
-    public static String generateRefreshToken(Long userId, Long tenantId, String tokenId, List<String> roles, String username) {
-        return generateToken(userId, tenantId, tokenId, roles, username, REFRESH_EXPIRE);
+    public static String generateRefreshToken(Long userId, Long tenantId, String tokenId,
+                                               List<String> roles, List<String> permissions, String username) {
+        return generateToken(userId, tenantId, tokenId, roles, permissions, username, REFRESH_EXPIRE);
     }
 
-    private static String generateToken(Long userId, Long tenantId, String tokenId, List<String> roles, String username, long expire) {
+    private static String generateToken(Long userId, Long tenantId, String tokenId,
+                                         List<String> roles, List<String> permissions, String username, long expire) {
         Date now = new Date();
         return Jwts.builder()
                 .id(tokenId)
                 .subject(String.valueOf(userId))
                 .claim("tenantId", tenantId)
                 .claim("roles", roles != null ? roles : Collections.emptyList())
+                .claim("permissions", permissions != null ? permissions : Collections.emptyList())
                 .claim("username", username != null ? username : "")
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expire))
@@ -75,6 +79,16 @@ public class JwtUtil {
         if (claims == null) return Collections.emptyList();
         Object rolesObj = claims.get("roles");
         if (rolesObj instanceof List<?> list) {
+            return list.stream().map(Object::toString).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> getPermissions(Claims claims) {
+        if (claims == null) return Collections.emptyList();
+        Object permsObj = claims.get("permissions");
+        if (permsObj instanceof List<?> list) {
             return list.stream().map(Object::toString).collect(Collectors.toList());
         }
         return Collections.emptyList();
