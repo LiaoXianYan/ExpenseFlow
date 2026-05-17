@@ -18,28 +18,29 @@ public class ExpensePolicyController {
 
     private final ExpensePolicyService policyService;
 
+    @PreAuthorize("hasAuthority('policy:view')")
     @GetMapping("/list")
     public Result<List<ExExpensePolicy>> list() {
         return policyService.list();
     }
 
+    @PreAuthorize("hasAuthority('policy:create')")
     @PostMapping
     @AuditLog(module = "费用政策", operation = "CREATE")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','FINANCE')")
     public Result<ExExpensePolicy> create(@Valid @RequestBody ExpensePolicyDTO dto) {
         return policyService.create(dto);
     }
 
+    @PreAuthorize("hasAuthority('policy:edit')")
     @PutMapping("/{id}")
     @AuditLog(module = "费用政策", operation = "UPDATE")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','FINANCE')")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody ExpensePolicyDTO dto) {
         return policyService.update(id, dto);
     }
 
+    @PreAuthorize("hasAuthority('policy:delete')")
     @DeleteMapping("/{id}")
     @AuditLog(module = "费用政策", operation = "DELETE")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','FINANCE')")
     public Result<Void> delete(@PathVariable Long id) {
         return policyService.delete(id);
     }

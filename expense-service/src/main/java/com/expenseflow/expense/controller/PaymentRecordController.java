@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/expense/payment")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('FINANCE','CASHIER','SUPER_ADMIN')")
 public class PaymentRecordController extends BaseController {
 
     private final PaymentService paymentService;
 
+    @PreAuthorize("hasAuthority('payment:view')")
     @GetMapping("/page")
     public Result<Page<ExPaymentRecord>> page(
             @RequestParam(defaultValue = "1") int page,
@@ -24,6 +24,7 @@ public class PaymentRecordController extends BaseController {
         return paymentService.page(page, size);
     }
 
+    @PreAuthorize("hasAuthority('payment:create')")
     @PostMapping("/pay")
     @AuditLog(module = "打款管理", operation = "PAY")
     public Result<ExPaymentRecord> pay(@RequestParam Long reportId) {

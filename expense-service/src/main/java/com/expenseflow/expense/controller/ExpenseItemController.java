@@ -10,6 +10,7 @@ import com.expenseflow.expense.vo.ExpenseReportVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -27,12 +28,14 @@ public class ExpenseItemController {
             new LambdaQueryWrapper<ExExpenseItem>().eq(ExExpenseItem::getReportId, reportId)));
     }
 
+    @PreAuthorize("hasAuthority('report:edit')")
     @PostMapping
     @AuditLog(module = "报销明细", operation = "ADD")
     public Result<ExpenseReportVO> add(@PathVariable Long reportId, @Valid @RequestBody ExpenseItemDTO dto) {
         return reportService.addItem(reportId, dto);
     }
 
+    @PreAuthorize("hasAuthority('report:edit')")
     @DeleteMapping("/{itemId}")
     @AuditLog(module = "报销明细", operation = "DELETE")
     public Result<Void> delete(@PathVariable Long reportId, @PathVariable Long itemId) {

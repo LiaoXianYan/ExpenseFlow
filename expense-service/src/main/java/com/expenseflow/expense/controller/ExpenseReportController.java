@@ -11,6 +11,7 @@ import com.expenseflow.expense.vo.InvoiceVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class ExpenseReportController extends BaseController {
 
     private final ExpenseReportService reportService;
 
+    @PreAuthorize("hasAuthority('report:view')")
     @GetMapping("/page")
     public Result<Page<ExpenseReportVO>> page(
             @RequestParam(defaultValue = "1") int page,
@@ -30,11 +32,13 @@ public class ExpenseReportController extends BaseController {
         return reportService.page(page, size, getCurrentUserId(), status);
     }
 
+    @PreAuthorize("hasAuthority('report:view')")
     @GetMapping("/{id}")
     public Result<ExpenseReportVO> getById(@PathVariable Long id) {
         return reportService.getById(id);
     }
 
+    @PreAuthorize("hasAuthority('report:create')")
     @PostMapping
     @AuditLog(module = "报销单", operation = "CREATE")
     public Result<ExpenseReportVO> create(@Valid @RequestBody ExpenseReportDTO dto) {
@@ -42,24 +46,28 @@ public class ExpenseReportController extends BaseController {
         return reportService.create(dto);
     }
 
+    @PreAuthorize("hasAuthority('report:edit')")
     @PutMapping("/{id}")
     @AuditLog(module = "报销单", operation = "UPDATE")
     public Result<ExpenseReportVO> update(@PathVariable Long id, @Valid @RequestBody ExpenseReportDTO dto) {
         return reportService.update(id, dto);
     }
 
+    @PreAuthorize("hasAuthority('report:delete')")
     @DeleteMapping("/{id}")
     @AuditLog(module = "报销单", operation = "DELETE")
     public Result<Void> delete(@PathVariable Long id) {
         return reportService.delete(id);
     }
 
+    @PreAuthorize("hasAuthority('report:submit')")
     @PostMapping("/{id}/submit")
     @AuditLog(module = "报销单", operation = "SUBMIT")
     public Result<ExpenseReportVO> submit(@PathVariable Long id) {
         return reportService.submit(id);
     }
 
+    @PreAuthorize("hasAuthority('report:withdraw')")
     @PostMapping("/{id}/withdraw")
     @AuditLog(module = "报销单", operation = "WITHDRAW")
     public Result<ExpenseReportVO> withdraw(@PathVariable Long id) {
