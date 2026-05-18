@@ -61,6 +61,22 @@
           <el-descriptions-item label="耗时">{{ result.processTimeMs }}ms</el-descriptions-item>
         </el-descriptions>
         <el-alert :title="result.reviewOpinion" type="info" :closable="false" style="margin-top:12px;border-radius:10px" />
+
+        <div v-if="result.ruleDetails?.length" class="rule-details">
+          <el-divider content-position="left">规则检查明细</el-divider>
+          <div v-for="rule in result.ruleDetails" :key="rule.name" class="rule-item">
+            <el-icon :size="16" :color="rule.action === 'PASS' ? '#10B981' : rule.action === 'WARN' ? '#F59E0B' : '#EF4444'">
+              <SuccessFilled v-if="rule.action === 'PASS'" />
+              <WarningFilled v-else-if="rule.action === 'WARN'" />
+              <CircleCloseFilled v-else />
+            </el-icon>
+            <span class="rule-name">{{ rule.name }}</span>
+            <el-tag :type="rule.action === 'PASS' ? 'success' : rule.action === 'WARN' ? 'warning' : 'danger'" size="small">
+              {{ rule.action === 'PASS' ? '通过' : rule.action === 'WARN' ? '警告' : '阻止' }}
+            </el-tag>
+            <span v-if="rule.reason" class="rule-reason">{{ rule.reason }}</span>
+          </div>
+        </div>
       </div>
     </el-card>
   </div>
@@ -89,4 +105,11 @@ async function handleReview() {
 .subtitle { color: #94a3b8; font-size: 13px; margin: 4px 0 0; }
 .form-card { border-radius: 14px; }
 .result-area { margin-top: 8px; }
+.rule-details { margin-top: 8px; }
+.rule-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 6px;
+}
+.rule-name { font-weight: 500; font-size: 13px; color: #1E293B; flex: 1; }
+.rule-reason { font-size: 12px; color: #94A3B8; }
 </style>

@@ -76,6 +76,41 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <!-- Risk Alerts -->
+    <el-row :gutter="20" style="margin-top:20px">
+      <el-col :span="24">
+        <el-card class="chart-card">
+          <template #header>
+            <div class="chart-header">
+              <span>风控告警（近7天）</span>
+              <el-tag size="small" type="warning">Drools 11 规则</el-tag>
+            </div>
+          </template>
+          <el-table :data="riskAlerts" size="small" class="data-table">
+            <el-table-column width="32">
+              <template #default="{ row }">
+                <el-icon :color="row.action === 'BLOCK' ? '#EF4444' : '#F59E0B'" :size="16">
+                  <WarningFilled v-if="row.action === 'WARN'" />
+                  <CircleCloseFilled v-else />
+                </el-icon>
+              </template>
+            </el-table-column>
+            <el-table-column prop="description" label="告警描述" />
+            <el-table-column prop="businessNo" label="关联单据" width="200" />
+            <el-table-column prop="createdAt" label="时间" width="170" />
+            <el-table-column prop="action" label="级别" width="80">
+              <template #default="{ row }">
+                <el-tag :type="row.action === 'BLOCK' ? 'danger' : 'warning'" size="small">
+                  {{ row.action === 'BLOCK' ? '严重' : '警告' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-empty v-if="riskAlerts.length === 0" description="暂无风控告警" :image-size="60" />
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -85,11 +120,13 @@ import * as echarts from 'echarts'
 import { getTravelList } from '../../api/travel'
 import { getReportList } from '../../api/report'
 import { getTaskList } from '../../api/approval'
+import { getRecentAlerts } from '../../api/ai'
 import { useUserStore } from '../../stores/user'
 
 const userStore = useUserStore()
 const stats = reactive({ travel: 0, report: 0, pending: 0, payment: '0' })
 const pieChart = ref(); const barChart = ref()
+const riskAlerts = ref<any[]>([])
 
 const today = new Date().toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric', weekday:'long' })
 const greeting = (() => {
@@ -128,6 +165,10 @@ onMounted(async () => {
       yAxis: { splitLine: { lineStyle: { color: '#f1f5f9' } }, axisLabel: { show: false } },
       series: [{ type: 'bar', data: [12, 5, 2, 1], barWidth: 32, itemStyle: { borderRadius: [6,6,0,0] } }]
     })
+
+    getRecentAlerts({ days: 7, limit: 5 }).then(res => {
+      riskAlerts.value = res.data ?? []
+    }).catch(() => {})
   } catch(e) {}
 })
 </script>
