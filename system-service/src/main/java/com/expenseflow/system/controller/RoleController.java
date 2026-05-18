@@ -10,6 +10,7 @@ import com.expenseflow.system.entity.SysUserRole;
 import com.expenseflow.system.entity.SysRolePermission;
 import com.expenseflow.system.mapper.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,10 +30,30 @@ public class RoleController {
     private final SysRolePermissionMapper rolePermMapper;
 
     @PreAuthorize("hasAuthority('role:view')")
+    @GetMapping("/page")
+    public Result<Page<SysRole>> page(@RequestParam(defaultValue = "1") int page,
+                                       @RequestParam(defaultValue = "10") int size,
+                                       @RequestParam(required = false) String keyword) {
+        LambdaQueryWrapper<SysRole> qw = new LambdaQueryWrapper<>();
+        if (keyword != null && !keyword.isEmpty()) {
+            qw.and(w -> w.like(SysRole::getRoleName, keyword).or().like(SysRole::getRoleCode, keyword));
+        }
+        qw.orderByDesc(SysRole::getCreateTime);
+        return Result.ok(roleMapper.selectPage(new Page<>(page, size), qw));
+    }
+
+    @PreAuthorize("hasAuthority('role:view')")
     @GetMapping("/list")
     public Result<List<SysRole>> list() {
         return Result.ok(roleMapper.selectList(
             new LambdaQueryWrapper<SysRole>().orderByDesc(SysRole::getCreateTime)));
+    }
+
+    @PreAuthorize("hasAuthority('role:view')")
+    @GetMapping("/{id}")
+    public Result<SysRole> getById(@PathVariable Long id) {
+        SysRole role = roleMapper.selectById(id);
+        return role == null ? Result.fail(404, "角色不存在") : Result.ok(role);
     }
 
     @PreAuthorize("hasAuthority('role:create')")

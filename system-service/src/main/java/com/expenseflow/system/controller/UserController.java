@@ -54,16 +54,19 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('user:edit')")
-    @PatchMapping("/{id}/status")
+    @PutMapping("/{id}/status")
     @AuditLog(module = "用户管理", operation = "UPDATE_STATUS")
-    public Result<Void> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
+    public Result<Void> updateStatus(@PathVariable Long id, @RequestBody java.util.Map<String, Object> body) {
+        Object raw = body.get("status");
+        Integer status = raw instanceof Integer ? (Integer) raw : Integer.valueOf(raw.toString());
         return userService.updateStatus(id, status);
     }
 
     @PreAuthorize("hasAuthority('user:edit')")
-    @PatchMapping("/{id}/password")
+    @PutMapping("/{id}/reset-password")
     @AuditLog(module = "用户管理", operation = "RESET_PASSWORD")
-    public Result<Void> resetPassword(@PathVariable Long id, @RequestParam String password) {
+    public Result<Void> resetPassword(@PathVariable Long id, @RequestBody java.util.Map<String, Object> body) {
+        String password = (String) body.getOrDefault("password", "123456");
         return userService.resetPassword(id, password);
     }
 }

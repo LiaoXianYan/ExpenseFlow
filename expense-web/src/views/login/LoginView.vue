@@ -58,8 +58,7 @@ async function handleLogin() {
   loading.value = true
   try {
     const res = await login(form.username, form.password)
-    userStore.setToken(res.data.accessToken)
-    userStore.setUserInfo(res.data.user)
+    await userStore.login(res.data.accessToken, res.data.user)
     ElMessage.success('登录成功')
     router.push('/dashboard')
   } catch (e) { /* handled by interceptor */ }

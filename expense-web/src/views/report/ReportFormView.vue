@@ -10,7 +10,7 @@
       </el-form>
 
       <el-divider>报销明细 (总额: {{ totalAmount }})</el-divider>
-      <el-button type="primary" size="small" @click="showItemDialog=true; itemForm={}" style="margin-bottom:12px">添加明细</el-button>
+      <el-button type="primary" size="small" @click="showItemDialog=true; Object.assign(itemForm, { expenseType: 'TRANSPORT', expenseDate: '', amount: 0, description: '' })" style="margin-bottom:12px">添加明细</el-button>
       <el-table :data="items" stripe>
         <el-table-column prop="expenseType" label="费用类型" width="120" />
         <el-table-column prop="expenseDate" label="日期" width="120" />

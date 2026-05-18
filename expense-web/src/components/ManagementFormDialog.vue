@@ -1,6 +1,7 @@
 <template>
   <el-dialog
-    v-model="visible"
+    :model-value="visible"
+    @update:model-value="$emit('update:visible', $event)"
     :title="title"
     :width="width"
     :close-on-click-modal="false"
@@ -104,6 +105,7 @@ defineProps<{
 }>()
 
 defineEmits<{
+  'update:visible': [value: boolean]
   submit: []
   cancel: []
   closed: []

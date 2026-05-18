@@ -73,8 +73,10 @@ public class TenantController {
     }
 
     @PreAuthorize("hasAuthority('tenant:edit')")
-    @PatchMapping("/{id}/status")
-    public Result<Void> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
+    @PutMapping("/{id}/status")
+    public Result<Void> updateStatus(@PathVariable Long id, @RequestBody java.util.Map<String, Object> body) {
+        Object raw = body.get("status");
+        Integer status = raw instanceof Integer ? (Integer) raw : 1;
         SysTenant t = tenantMapper.selectById(id);
         if (t == null) return Result.fail(404, "租户不存在");
         t.setStatus(status);

@@ -30,4 +30,11 @@ public class PaymentRecordController extends BaseController {
     public Result<ExPaymentRecord> pay(@RequestParam Long reportId) {
         return paymentService.pay(reportId, getCurrentUserId());
     }
+
+    @PreAuthorize("hasAuthority('payment:create')")
+    @PostMapping("/{reportId}/pay")
+    @AuditLog(module = "打款管理", operation = "PAY")
+    public Result<ExPaymentRecord> payByPath(@PathVariable Long reportId) {
+        return paymentService.pay(reportId, getCurrentUserId());
+    }
 }
