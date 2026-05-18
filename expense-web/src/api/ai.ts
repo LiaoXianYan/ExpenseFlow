@@ -12,3 +12,12 @@ export function askRag(question: string) {
 export function triggerOcrRecognition(invoiceId: number, imageUrl?: string) {
   return request.post('/ai/ocr/recognize', { invoiceId, imageUrl })
 }
+export function getAuditLogPage(params: any) {
+  return request.get('/ai/review/logs/page', { params })
+}
+export function getRuleResults(taskId: string) {
+  return request.get(`/approval/tasks/${taskId}/rule-results`)
+}
+export function getRecentAlerts(params: { days: number; limit: number }) {
+  return request.get('/ai/review/alerts/recent', { params })
+}
