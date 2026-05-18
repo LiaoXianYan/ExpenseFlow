@@ -738,3 +738,23 @@ INSERT INTO nt_notification_template (tenant_id, template_code, template_name, c
  '↩️ 报销申请已撤回',
  '**单号：** {reportNo}\n**撤回人：** {applicantName}\n**原状态：** {previousStatus}',
  1, NOW());
+
+-- 部门预算表
+DROP TABLE IF EXISTS sys_department_budget;
+CREATE TABLE sys_department_budget (
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    department_id   BIGINT NOT NULL COMMENT '部门ID',
+    budget_year     INT NOT NULL COMMENT '预算年度',
+    budget_quarter  TINYINT COMMENT '预算季度 1-4, NULL=年度预算',
+    total_amount    DECIMAL(12,2) NOT NULL COMMENT '预算总额',
+    used_amount     DECIMAL(12,2) DEFAULT 0.00 COMMENT '已使用金额',
+    alert_threshold DECIMAL(5,2) DEFAULT 0.80 COMMENT '告警阈值',
+    status          VARCHAR(20) DEFAULT 'ACTIVE' COMMENT 'ACTIVE/FROZEN/CLOSED',
+    remark          VARCHAR(255) COMMENT '备注',
+    created_by      BIGINT COMMENT '创建人ID',
+    create_time     DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time     DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    tenant_id       BIGINT NOT NULL COMMENT '租户ID',
+    deleted         TINYINT DEFAULT 0 COMMENT '逻辑删除',
+    INDEX idx_dept_year (department_id, budget_year, tenant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='部门预算表';

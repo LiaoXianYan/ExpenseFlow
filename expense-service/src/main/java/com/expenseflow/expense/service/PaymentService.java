@@ -8,13 +8,16 @@ import com.expenseflow.expense.mapper.ExPaymentRecordMapper;
 import com.expenseflow.expense.util.NoGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.expenseflow.common.handler.ExpenseFlowTenantLineHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -23,6 +26,7 @@ public class PaymentService {
     private final ExExpenseReportMapper reportMapper;
     private final NoGenerator noGenerator;
     private final RabbitTemplate rabbitTemplate;
+    private final ExDepartmentBudgetService budgetService;
 
     public Result<Page<ExPaymentRecord>> page(int page, int size) {
         LambdaQueryWrapper<ExPaymentRecord> qw = new LambdaQueryWrapper<>();
@@ -36,6 +40,18 @@ public class PaymentService {
         if (report == null) return Result.fail(404, "报销单不存在");
         if (!"APPROVED".equals(report.getStatus()))
             return Result.fail(400, "仅已审批的报销单可打款");
+
+        // 扣减部门预算
+        try {
+            Long deptId = report.getDepartmentId();
+            if (deptId != null && report.getTotalAmount() != null) {
+                Long tenantId = report.getTenantId();
+                if (tenantId == null) tenantId = ExpenseFlowTenantLineHandler.getTenant();
+                budgetService.deductBudget(deptId, report.getTotalAmount(), tenantId);
+            }
+        } catch (Exception e) {
+            log.warn("预算扣减失败: {}", e.getMessage());
+        }
 
         ExPaymentRecord pr = new ExPaymentRecord();
         pr.setReportId(reportId);
