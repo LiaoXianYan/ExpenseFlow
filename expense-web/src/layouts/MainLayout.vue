@@ -36,6 +36,21 @@
           <el-icon><Checked /></el-icon><span>审批中心</span>
         </el-menu-item>
 
+        <el-sub-menu index="system" v-if="perm.has('system:user') || perm.has('system:role') || perm.has('system:dept') || perm.has('system:tenant') || perm.has('policy:view')">
+          <template #title><el-icon><Setting /></el-icon><span>系统管理</span></template>
+          <el-menu-item index="/system/users" v-if="perm.has('system:user')">用户管理</el-menu-item>
+          <el-menu-item index="/system/roles" v-if="perm.has('system:role')">角色管理</el-menu-item>
+          <el-menu-item index="/system/departments" v-if="perm.has('system:dept')">部门管理</el-menu-item>
+          <el-menu-item index="/system/tenants" v-if="perm.has('system:tenant')">租户管理</el-menu-item>
+          <el-menu-item index="/system/policies" v-if="perm.has('policy:view')">差旅标准</el-menu-item>
+        </el-sub-menu>
+
+        <el-sub-menu index="finance" v-if="perm.has('finance:payment') || perm.has('finance:budget')">
+          <template #title><el-icon><Wallet /></el-icon><span>财务管理</span></template>
+          <el-menu-item index="/finance/payments" v-if="perm.has('finance:payment')">打款管理</el-menu-item>
+          <el-menu-item index="/finance/budgets" v-if="perm.has('finance:budget')">预算管理</el-menu-item>
+        </el-sub-menu>
+
         <el-sub-menu index="ai" v-if="perm.has('ai:review') || perm.has('ai:assistant')">
           <template #title><el-icon><Cpu /></el-icon><span>智能服务</span></template>
           <el-menu-item index="/ai-review" v-if="perm.has('ai:review')">智能审单</el-menu-item>
@@ -80,7 +95,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { usePermissionStore } from '@/stores/permission'
-import { SwitchButton } from '@element-plus/icons-vue'
+import { SwitchButton, Setting, Wallet } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()

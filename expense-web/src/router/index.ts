@@ -32,7 +32,47 @@ const routes: RouteRecordRaw[] = [
         component: () => import('../views/ai/AIAssistantView.vue'),
         meta: { permission: 'ai:assistant' }
       },
-      { path: 'notification', name: 'NotificationCenter', component: () => import('../views/notification/NotificationCenter.vue') }
+      { path: 'notification', name: 'NotificationCenter', component: () => import('../views/notification/NotificationCenter.vue') },
+      {
+        path: 'system/users', name: 'UserManagement',
+        component: () => import('../views/system/UserManagement.vue'),
+        meta: { permission: 'system:user' }
+      },
+      {
+        path: 'system/roles', name: 'RoleManagement',
+        component: () => import('../views/system/RoleManagement.vue'),
+        meta: { permission: 'system:role' }
+      },
+      {
+        path: 'system/departments', name: 'DepartmentManagement',
+        component: () => import('../views/system/DepartmentManagement.vue'),
+        meta: { permission: 'system:dept' }
+      },
+      {
+        path: 'system/tenants', name: 'TenantManagement',
+        component: () => import('../views/system/TenantManagement.vue'),
+        meta: { permission: 'system:tenant' }
+      },
+      {
+        path: 'system/policies', name: 'PolicyManagement',
+        component: () => import('../views/system/PolicyManagement.vue'),
+        meta: { permission: 'policy:view' }
+      },
+      {
+        path: 'finance/payments', name: 'PaymentManagement',
+        component: () => import('../views/finance/PaymentManagement.vue'),
+        meta: { permission: 'finance:payment' }
+      },
+      {
+        path: 'finance/budgets', name: 'BudgetManagement',
+        component: () => import('../views/finance/BudgetManagement.vue'),
+        meta: { permission: 'finance:budget' }
+      },
+      {
+        path: 'ai-audit-logs', name: 'AuditLogViewer',
+        component: () => import('../views/ai/AuditLogViewer.vue'),
+        meta: { permission: 'ai:review' }
+      }
     ]
   }
 ]
