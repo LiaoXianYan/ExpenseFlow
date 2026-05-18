@@ -29,13 +29,13 @@ public class BudgetController {
         if (departmentId != null) qw.eq(ExDepartmentBudget::getDepartmentId, departmentId);
         if (budgetYear != null) qw.eq(ExDepartmentBudget::getBudgetYear, budgetYear);
         qw.orderByDesc(ExDepartmentBudget::getBudgetYear);
-        return Result.success(budgetService.page(new Page<>(page, size), qw));
+        return Result.ok(budgetService.page(new Page<>(page, size), qw));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("@pms.hasPermission('finance:budget')")
     public Result<ExDepartmentBudget> getById(@PathVariable Long id) {
-        return Result.success(budgetService.getById(id));
+        return Result.ok(budgetService.getById(id));
     }
 
     @PostMapping
@@ -45,7 +45,7 @@ public class BudgetController {
         budget.setAlertThreshold(budget.getAlertThreshold() != null ? budget.getAlertThreshold() : new BigDecimal("0.80"));
         budget.setStatus("ACTIVE");
         budgetService.save(budget);
-        return Result.success();
+        return Result.ok();
     }
 
     @PutMapping("/{id}")
@@ -53,13 +53,13 @@ public class BudgetController {
     public Result<Void> update(@PathVariable Long id, @RequestBody ExDepartmentBudget budget) {
         budget.setId(id);
         budgetService.updateById(budget);
-        return Result.success();
+        return Result.ok();
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@pms.hasPermission('finance:budget')")
     public Result<Void> delete(@PathVariable Long id) {
         budgetService.removeById(id);
-        return Result.success();
+        return Result.ok();
     }
 }
